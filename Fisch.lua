@@ -51,6 +51,7 @@ _G.AutoCast = false
 _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
+_G.TeleportToMegalodon = false
 
 -- Auto Cast Toggle
 MainTab:CreateToggle({
@@ -155,4 +156,33 @@ spawn(function()
       end
    end
 end)
-local MainSection = MainTab:CreateSection("Freeze in event")
+
+-- Freeze in Event Section
+local FreezeSection = MainTab:CreateSection("Freeze in Event")
+
+-- Teleport to Megalodon Toggle
+FreezeSection:CreateToggle({
+   Name = "Teleport to Megalodon",
+   Callback = function(v)
+      _G.TeleportToMegalodon = v
+      spawn(function()
+         while _G.TeleportToMegalodon do
+            task.wait(1)
+            -- Check if Megalodon has spawned
+            local megalodon = workspace:FindFirstChild("Megalodon") -- Replace "Megalodon" with the actual name of the Megalodon in your game
+            if megalodon then
+               -- Teleport to Megalodon's position
+               local rootPart = Char and Char:FindFirstChild("HumanoidRootPart")
+               if rootPart then
+                  rootPart.CFrame = megalodon:GetPivot() -- Teleport to Megalodon's position
+                  Rayfield:Notify({
+                     Title = "Teleported to Megalodon",
+                     Content = "You have been teleported to the Megalodon!",
+                     Duration = 3,
+                  })
+               end
+            end
+         end
+      end)
+   end
+})
