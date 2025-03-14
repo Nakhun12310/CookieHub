@@ -163,3 +163,38 @@ spawn(function()
       end
    end
 end)
+local TeleportTab = Window:CreateTab("Teleport", 4483362458) -- Title, Image
+local Section = TeleportTab:CreateSection("Teleport")
+local FishIslandLocations = {
+   ["Moosewood"] = CFrame.new(100, 10, 50), -- Replace with actual coordinates
+   ["Zone 2"] = CFrame.new(200, 10, 60), -- Replace with actual coordinates
+   ["Zone 3"] = CFrame.new(300, 10, 70), -- Replace with actual coordinates
+   ["Zone 4"] = CFrame.new(400, 10, 80), -- Replace with actual coordinates
+   ["Zone 5"] = CFrame.new(500, 10, 90), -- Replace with actual coordinates
+   ["Megalodon Spawn"] = CFrame.new(600, 10, 100), -- Replace with actual coordinates
+   -- Add more zones as needed
+}
+
+-- Add buttons for each location
+for zoneName, zoneCFrame in pairs(FishIslandLocations) do
+   TeleportSection:CreateButton({
+      Name = "Teleport to " .. zoneName,
+      Callback = function()
+         local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+         if rootPart then
+            rootPart.CFrame = zoneCFrame -- Teleport to the specified location
+            Rayfield:Notify({
+               Title = "Teleported to " .. zoneName,
+               Content = "You have been teleported to " .. zoneName .. "!",
+               Duration = 3,
+            })
+         else
+            Rayfield:Notify({
+               Title = "Error",
+               Content = "Failed to teleport. Character not found.",
+               Duration = 3,
+            })
+         end
+      end,
+   })
+end
