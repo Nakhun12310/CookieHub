@@ -51,6 +51,7 @@ _G.AutoCast = false
 _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
+_G.Float On Water = false
 
 -- Auto Cast Toggle
 MainTab:CreateToggle({
@@ -155,3 +156,33 @@ spawn(function()
       end
    end
 end)
+-- Add a new global variable for floating
+_G.FloatOnWater = false
+
+-- Floating on Water Toggle
+MainTab:CreateToggle({
+   Name = "Float on Water",
+   Callback = function(v)
+      _G.FloatOnWater = v
+      spawn(function()
+         while _G.FloatOnWater do
+            task.wait(0.1)
+            Char = getCharacter()
+            local RootPart = Char and Char:FindFirstChild("HumanoidRootPart")
+            if RootPart then
+               -- Get the water level (you may need to adjust this based on your game)
+               local waterLevel = 0 -- Replace with the actual water level in your game
+               -- Adjust the Y position of the RootPart to float above the water
+               RootPart.Position = Vector3.new(RootPart.Position.X, waterLevel + 5, RootPart.Position.Z)
+               RootPart.Anchored = true
+            end
+         end
+         -- Unanchor when toggled off
+         Char = getCharacter()
+         local RootPart = Char and Char:FindFirstChild("HumanoidRootPart")
+         if RootPart then
+            RootPart.Anchored = false
+         end
+      end)
+   end
+})
