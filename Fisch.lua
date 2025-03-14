@@ -31,14 +31,14 @@ Rayfield:Notify({
    Image = 124714113910876,
 })
 
--- Define essential variables
+-- Services
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 
--- Ensure Character Loads Properly
+-- Get Character Function
 local function getCharacter()
    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
@@ -51,10 +51,9 @@ _G.AutoCast = false
 _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
-_G.TeleportToMegalodon = false
 
 -- Auto Cast Toggle
-MainTab:CreateToggle({
+MainSection:CreateToggle({
    Name = "Auto Cast",
    Callback = function(v)
       _G.AutoCast = v
@@ -72,7 +71,7 @@ MainTab:CreateToggle({
 })
 
 -- Auto Shake Toggle
-MainTab:CreateToggle({
+MainSection:CreateToggle({
    Name = "Auto Shake",
    Callback = function(v)
       _G.AutoShake = v
@@ -98,7 +97,7 @@ MainTab:CreateToggle({
 })
 
 -- Auto Reel Toggle
-MainTab:CreateToggle({
+MainSection:CreateToggle({
    Name = "Auto Reel",
    Callback = function(v)
       _G.AutoReel = v
@@ -118,23 +117,27 @@ MainTab:CreateToggle({
    end
 })
 
--- Freeze Character Toggle
-MainTab:CreateToggle({
-   Name = "Freeze Character (do not use while farming.)",
+-- Freeze Character Toggle (Can Fish While Frozen)
+MainSection:CreateToggle({
+   Name = "Freeze Character (can fish while freezing)",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
          while _G.FreezeCharacter do
             Char = getCharacter()
-            if Char and Char:FindFirstChild("HumanoidRootPart") then
-               Char.HumanoidRootPart.Anchored = true
+            local Humanoid = Char:FindFirstChildOfClass("Humanoid")
+            if Humanoid then
+               Humanoid.WalkSpeed = 0 -- Stop movement
+               Humanoid.JumpPower = 0 -- Stop jumping
             end
             task.wait(0.1)
          end
-         -- Unfreeze when toggled off
+         -- Restore movement when toggled off
          Char = getCharacter()
-         if Char and Char:FindFirstChild("HumanoidRootPart") then
-            Char.HumanoidRootPart.Anchored = false
+         local Humanoid = Char:FindFirstChildOfClass("Humanoid")
+         if Humanoid then
+            Humanoid.WalkSpeed = 16 -- Default speed
+            Humanoid.JumpPower = 50 -- Default jump power
          end
       end)
    end
@@ -156,33 +159,3 @@ spawn(function()
       end
    end
 end)
-
--- Freeze in Event Section
-local FreezeSection = MainTab:CreateSection("Freeze in Event")
-
--- Teleport to Megalodon Toggle
-FreezeSection:CreateToggle({
-   Name = "Teleport to Megalodon",
-   Callback = function(v)
-      _G.TeleportToMegalodon = v
-      spawn(function()
-         while _G.TeleportToMegalodon do
-            task.wait(1)
-            -- Check if Megalodon has spawned
-            local megalodon = workspace:FindFirstChild("Megalodon") -- Replace "Megalodon" with the actual name of the Megalodon in your game
-            if megalodon then
-               -- Teleport to Megalodon's position
-               local rootPart = Char and Char:FindFirstChild("HumanoidRootPart")
-               if rootPart then
-                  rootPart.CFrame = megalodon:GetPivot() -- Teleport to Megalodon's position
-                  Rayfield:Notify({
-                     Title = "Teleported to Megalodon",
-                     Content = "You have been teleported to the Megalodon!",
-                     Duration = 3,
-                  })
-               end
-            end
-         end
-      end)
-   end
-})
