@@ -47,29 +47,6 @@ local Button = MainTab:CreateButton({
    Name = "Auto Farm",
    Callback = function()
    --[[
-    Open Src AutoFisch Script By : NOOBHUB
-]]
-local Player = game:GetService("Players")
-local LocalPlayer = Player.LocalPlayer
-local Char = LocalPlayer.Character
-local Humanoid = Char.Humanoid
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GuiService = game:GetService("GuiService")
-
-equipitem = function(v)
-if LocalPlayer.Backpack:FindFirstChild(v) then
-    local a = LocalPlayer.Backpack:FindFirstChild(v)
-        Humanoid:EquipTool(a)
-    end
-end
-
-
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Fisch", "DarkTheme")
-local Tab = Window:NewTab("MAIN")
-local Section = Tab:NewSection("MAIN")
-
 -- AutoCast
 Section:NewToggle("AutoCast", "", function(v)
 _G.AutoCast = v
