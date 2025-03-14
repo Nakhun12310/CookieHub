@@ -13,7 +13,7 @@ local Key = "prefis8b03e264f1244d7da9db6149389aa1bf";
 print(KeyGuardian:GetKeylink())
 
 
-loadstring(game:HttpGet("https://
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Nakhun12310/CookieHub/refs/heads/main/HubGui.lua"))()
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
