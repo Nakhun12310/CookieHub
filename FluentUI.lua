@@ -60,4 +60,4 @@ local Getkey = Tabs.KeySys:AddButton({
 		end
 })
 
-Window:SelectTab(1)
+Window:SelectTab(3) // once is a 1
