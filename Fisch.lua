@@ -22,7 +22,7 @@ local Window = Rayfield:CreateWindow({
 })
 
 local MainTab = Window:CreateTab("🏠 | Main", 124714113910876)
-local MainSection = MainTab:CreateSection("Main")
+local MainSection = MainTab:CreateSection("Auto Farm")
 
 Rayfield:Notify({
    Title = "Welcome to Cookie Hub!",
@@ -155,3 +155,4 @@ spawn(function()
       end
    end
 end)
+local MainSection = MainTab:CreateSection("Freeze in event")
