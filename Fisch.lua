@@ -119,7 +119,7 @@ MainTab:CreateToggle({
 
 -- Freeze Character Toggle
 MainTab:CreateToggle({
-   Name = "Freeze Character",
+   Name = "Freeze Character (do not use while farming.)",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
