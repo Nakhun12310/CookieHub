@@ -22,7 +22,7 @@ local Window = Rayfield:CreateWindow({
 })
 
 local MainTab = Window:CreateTab("🏠 | Main", 124714113910876)
-local MainSection = MainTab:CreateSection("Auto Farm")
+local MainSection = MainTab:CreateSection("Main")
 
 Rayfield:Notify({
    Title = "Welcome to Cookie Hub!",
@@ -31,14 +31,14 @@ Rayfield:Notify({
    Image = 124714113910876,
 })
 
--- Services
+-- Define essential variables
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 
--- Get Character Function
+-- Ensure Character Loads Properly
 local function getCharacter()
    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
@@ -52,9 +52,8 @@ _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
 
--- ✅ Make sure toggles appear properly inside MainSection
-
-MainSection:CreateToggle({
+-- Auto Cast Toggle
+MainTab:CreateToggle({
    Name = "Auto Cast",
    Callback = function(v)
       _G.AutoCast = v
@@ -64,14 +63,23 @@ MainSection:CreateToggle({
             Char = getCharacter()
             local Rod = Char:FindFirstChildOfClass("Tool")
             if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
+               -- Temporarily unfreeze the character for casting
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = false
+               end
                Rod.events.cast:FireServer(100, 1)
+               -- Optionally, freeze the character again after casting
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = true
+               end
             end
          end
       end)
    end
 })
 
-MainSection:CreateToggle({
+-- Auto Shake Toggle
+MainTab:CreateToggle({
    Name = "Auto Shake",
    Callback = function(v)
       _G.AutoShake = v
@@ -96,7 +104,8 @@ MainSection:CreateToggle({
    end
 })
 
-MainSection:CreateToggle({
+-- Auto Reel Toggle
+MainTab:CreateToggle({
    Name = "Auto Reel",
    Callback = function(v)
       _G.AutoReel = v
@@ -116,26 +125,23 @@ MainSection:CreateToggle({
    end
 })
 
-MainSection:CreateToggle({
-   Name = "Freeze Character (can fish while freezing)",
+-- Freeze Character Toggle
+MainTab:CreateToggle({
+   Name = "Freeze Character",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
          while _G.FreezeCharacter do
             Char = getCharacter()
-            local Humanoid = Char:FindFirstChildOfClass("Humanoid")
-            if Humanoid then
-               Humanoid.WalkSpeed = 0 -- Stop movement
-               Humanoid.JumpPower = 0 -- Stop jumping
+            if Char and Char:FindFirstChild("HumanoidRootPart") then
+               Char.HumanoidRootPart.Anchored = true
             end
             task.wait(0.1)
          end
-         -- Restore movement when toggled off
+         -- Unfreeze when toggled off
          Char = getCharacter()
-         local Humanoid = Char:FindFirstChildOfClass("Humanoid")
-         if Humanoid then
-            Humanoid.WalkSpeed = 16 -- Default speed
-            Humanoid.JumpPower = 50 -- Default jump power
+         if Char and Char:FindFirstChild("HumanoidRootPart") then
+            Char.HumanoidRootPart.Anchored = false
          end
       end)
    end
