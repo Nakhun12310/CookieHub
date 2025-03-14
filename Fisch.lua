@@ -52,7 +52,8 @@ _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
 
--- Auto Cast Toggle
+-- ✅ Make sure toggles appear properly inside MainSection
+
 MainSection:CreateToggle({
    Name = "Auto Cast",
    Callback = function(v)
@@ -70,7 +71,6 @@ MainSection:CreateToggle({
    end
 })
 
--- Auto Shake Toggle
 MainSection:CreateToggle({
    Name = "Auto Shake",
    Callback = function(v)
@@ -96,7 +96,6 @@ MainSection:CreateToggle({
    end
 })
 
--- Auto Reel Toggle
 MainSection:CreateToggle({
    Name = "Auto Reel",
    Callback = function(v)
@@ -117,9 +116,8 @@ MainSection:CreateToggle({
    end
 })
 
--- Freeze Character Toggle (Can Fish While Frozen)
 MainSection:CreateToggle({
-   Name = "Freeze Character",
+   Name = "Freeze Character (can fish while freezing)",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
