@@ -13,7 +13,7 @@ local Key = "prefis8b03e264f1244d7da9db6149389aa1bf";
 print(KeyGuardian:GetKeylink())
 
 
--- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
+loadstring(game:HttpGet("https://
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
 -- DO NOT CHANGE ANYTHING UNDER THIS, ONLY CHANGE THE LINE "-- put your script here"!!!!!!
