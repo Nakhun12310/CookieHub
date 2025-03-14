@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Cookie Hub",
+   Name = "🍪 | Cookie Hub",
    Icon = 0,
    LoadingTitle = "Loading, please wait...",
    LoadingSubtitle = "by Nakhun12310",
@@ -21,7 +21,7 @@ local Window = Rayfield:CreateWindow({
    KeySystem = false,
 })
 
-local MainTab = Window:CreateTab("🏠 | Main", 124714113910876)
+local MainTab = Window:CreateTab("Main", 124714113910876)
 local MainSection = MainTab:CreateSection("Main")
 
 Rayfield:Notify({
