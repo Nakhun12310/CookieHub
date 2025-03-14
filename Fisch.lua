@@ -119,7 +119,7 @@ MainSection:CreateToggle({
 
 -- Freeze Character Toggle (Can Fish While Frozen)
 MainSection:CreateToggle({
-   Name = "Freeze Character (can fish while freezing)",
+   Name = "Freeze Character",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
