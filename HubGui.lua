@@ -60,7 +60,7 @@ copyCorner.Parent = copyButton
 -- Mapping place IDs to raw GitHub links
 local repoUrl = "https://raw.githubusercontent.com/yourusername/yourrepo/main/"
 local placeHubMapping = {
-    [123456789] = {name = "Fisch", link = "https://github.com/yourrepo1", file = "map1.lua"},
+    [123456789] = {name = "Fisch", link = "https://raw.githubusercontent.com/Nakhun12310/CookieHub/refs/heads/main/Fisch.lua", file = "map1.lua"},
     [987654321] = {name = "Hub for Map 2", link = "https://github.com/yourrepo2", file = "map2.lua"},
     [112233445] = {name = "Hub for Map 3", link = "https://github.com/yourrepo3", file = "map3.lua"}
 }
