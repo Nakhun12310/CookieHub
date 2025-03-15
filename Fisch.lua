@@ -51,8 +51,17 @@ _G.AutoCast = false
 _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
+_G.InstantReel = false
 
--- Auto Cast Toggle
+-- Freeze Character Function
+local function freezeCharacter(state)
+   Char = getCharacter()
+   if Char and Char:FindFirstChild("HumanoidRootPart") then
+      Char.HumanoidRootPart.Anchored = state
+   end
+end
+
+-- Auto Cast Toggle (Modified for Freeze Compatibility)
 MainTab:CreateToggle({
    Name = "Auto Cast",
    Callback = function(v)
@@ -65,12 +74,12 @@ MainTab:CreateToggle({
             if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
                -- Temporarily unfreeze the character for casting
                if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = false
+                  freezeCharacter(false)
                end
                Rod.events.cast:FireServer(100, 1)
                -- Optionally, freeze the character again after casting
                if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = true
+                  freezeCharacter(true)
                end
             end
          end
@@ -104,7 +113,7 @@ MainTab:CreateToggle({
    end
 })
 
--- Auto Reel Toggle
+-- Auto Reel Toggle (Modified for Freeze Compatibility)
 MainTab:CreateToggle({
    Name = "Auto Reel",
    Callback = function(v)
@@ -116,7 +125,15 @@ MainTab:CreateToggle({
                if v:IsA("ScreenGui") and v.Name == "reel" then
                   local bar = v:FindFirstChild("bar")
                   if bar then
+                     -- Temporarily unfreeze the character for reeling
+                     if _G.FreezeCharacter then
+                        freezeCharacter(false)
+                     end
                      ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                     -- Optionally, freeze the character again after reeling
+                     if _G.FreezeCharacter then
+                        freezeCharacter(true)
+                     end
                   end
                end
             end
@@ -125,24 +142,47 @@ MainTab:CreateToggle({
    end
 })
 
--- Freeze Character Toggle
+-- Instant Reel Toggle (Modified for Freeze Compatibility)
+MainTab:CreateToggle({
+   Name = "Instant Reel",
+   Callback = function(v)
+      _G.InstantReel = v
+      spawn(function()
+         while _G.InstantReel do
+            for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+               if v:IsA("ScreenGui") and v.Name == "reel" then
+                  local bar = v:FindFirstChild("bar")
+                  if bar then
+                     -- Temporarily unfreeze the character for reeling
+                     if _G.FreezeCharacter then
+                        freezeCharacter(false)
+                     end
+                     ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                     -- Optionally, freeze the character again after reeling
+                     if _G.FreezeCharacter then
+                        freezeCharacter(true)
+                     end
+                  end
+               end
+            end
+            task.wait(0.01) -- Minimal delay to prevent crashing
+         end
+      end)
+   end
+})
+
+-- Freeze Character Toggle (Modified for Fishing Compatibility)
 MainTab:CreateToggle({
    Name = "Freeze Character",
    Callback = function(v)
       _G.FreezeCharacter = v
       spawn(function()
          while _G.FreezeCharacter do
-            Char = getCharacter()
-            if Char and Char:FindFirstChild("HumanoidRootPart") then
-               Char.HumanoidRootPart.Anchored = true
-            end
+            freezeCharacter(true)
             task.wait(0.1)
          end
          -- Unfreeze when toggled off
-         Char = getCharacter()
-         if Char and Char:FindFirstChild("HumanoidRootPart") then
-            Char.HumanoidRootPart.Anchored = false
-         end
+         freezeCharacter(false)
       end)
    end
 })
@@ -163,5 +203,3 @@ spawn(function()
       end
    end
 end)
-   })
-end
