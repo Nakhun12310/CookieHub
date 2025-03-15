@@ -247,7 +247,7 @@ MainTab:CreateToggle({
 })
 
 local AutoTab = Window:CreateTab("Auto", 124714113910876)
-local AutoSection = MainTab:CreateSection("Auto")
+local AutoSection = AutoTab:CreateSection("Auto")
 
 -- Add this toggle under the other toggles in the script
 AutoTab:CreateToggle({
