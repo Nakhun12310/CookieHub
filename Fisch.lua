@@ -53,13 +53,38 @@ _G.AutoReel = false
 _G.FreezeCharacter = false
 _G.InstantShake = false
 
--- Auto Shake Toggle (Modified for Instant Shake)
+-- Auto Cast Toggle
+MainTab:CreateToggle({
+   Name = "Auto Cast",
+   Callback = function(v)
+      _G.AutoCast = v
+      spawn(function()
+         while _G.AutoCast do
+            task.wait(0.1)
+            Char = getCharacter()
+            local Rod = Char:FindFirstChildOfClass("Tool")
+            if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = false
+               end
+               Rod.events.cast:FireServer(100, 1)
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = true
+               end
+            end
+         end
+      end)
+   end
+})
+
+-- Auto Shake Toggle
 MainTab:CreateToggle({
    Name = "Auto Shake",
    Callback = function(v)
       _G.AutoShake = v
       spawn(function()
          while _G.AutoShake do
+            task.wait(0.01)
             local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
             local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
             if shakeUI and shakeUI.Enabled then
@@ -73,7 +98,49 @@ MainTab:CreateToggle({
                   end
                end
             end
-            task.wait() -- Minimal delay to prevent crashing
+         end
+      end)
+   end
+})
+
+-- Auto Reel Toggle
+MainTab:CreateToggle({
+   Name = "Auto Reel",
+   Callback = function(v)
+      _G.AutoReel = v
+      spawn(function()
+         while _G.AutoReel do
+            task.wait(0.15)
+            for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+               if v:IsA("ScreenGui") and v.Name == "reel" then
+                  local bar = v:FindFirstChild("bar")
+                  if bar then
+                     ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                  end
+               end
+            end
+         end
+      end)
+   end
+})
+
+-- Freeze Character Toggle
+MainTab:CreateToggle({
+   Name = "Freeze Character",
+   Callback = function(v)
+      _G.FreezeCharacter = v
+      spawn(function()
+         while _G.FreezeCharacter do
+            Char = getCharacter()
+            if Char and Char:FindFirstChild("HumanoidRootPart") then
+               Char.HumanoidRootPart.Anchored = true
+            end
+            task.wait(0.1)
+         end
+         -- Unfreeze when toggled off
+         Char = getCharacter()
+         if Char and Char:FindFirstChild("HumanoidRootPart") then
+            Char.HumanoidRootPart.Anchored = false
          end
       end)
    end
@@ -104,5 +171,3 @@ MainTab:CreateToggle({
       end)
    end
 })
-
--- [Rest of the code remains unchanged for other toggles and functionality]
