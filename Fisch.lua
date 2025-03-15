@@ -66,13 +66,16 @@ MainTab:CreateToggle({
             task.wait(0.1)
             Char = getCharacter()
             local Rod = Char:FindFirstChildOfClass("Tool")
-            if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
-               if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = false
-               end
-               Rod.events.cast:FireServer(100, 1)
-               if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = true
+            if Rod and Rod:FindFirstChild("events") then
+               local castEvent = Rod.events:FindFirstChild("cast")
+               if castEvent then
+                  if _G.FreezeCharacter then
+                     Char.HumanoidRootPart.Anchored = false
+                  end
+                  castEvent:FireServer(100, 1)
+                  if _G.FreezeCharacter then
+                     Char.HumanoidRootPart.Anchored = true
+                  end
                end
             end
          end
@@ -89,15 +92,17 @@ MainTab:CreateToggle({
          while _G.AutoShake do
             task.wait(0.01)
             local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
-            local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
-            if shakeUI and shakeUI.Enabled then
-               local safezone = shakeUI:FindFirstChild("safezone")
-               if safezone then
-                  local button = safezone:FindFirstChild("button")
-                  if button and button:IsA("ImageButton") and button.Visible then
-                     GuiService.SelectedObject = button
-                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+            if PlayerGUI then
+               local shakeUI = PlayerGUI:FindFirstChild("shakeui")
+               if shakeUI and shakeUI.Enabled then
+                  local safezone = shakeUI:FindFirstChild("safezone")
+                  if safezone then
+                     local button = safezone:FindFirstChild("button")
+                     if button and button:IsA("ImageButton") and button.Visible then
+                        GuiService.SelectedObject = button
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+                     end
                   end
                end
             end
@@ -117,8 +122,11 @@ MainTab:CreateToggle({
             for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
                if v:IsA("ScreenGui") and v.Name == "reel" then
                   local bar = v:FindFirstChild("bar")
-                  if bar then
-                     ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                  if bar and ReplicatedStorage:FindFirstChild("events") then
+                     local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
+                     if reelFinished then
+                        reelFinished:FireServer(100, true)
+                     end
                   end
                end
             end
@@ -149,32 +157,6 @@ MainTab:CreateToggle({
    end
 })
 
--- Instant Shake Toggle
-MainTab:CreateToggle({
-   Name = "Instant Shake",
-   Callback = function(v)
-      _G.InstantShake = v
-      spawn(function()
-         while _G.InstantShake do
-            local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
-            local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
-            if shakeUI and shakeUI.Enabled then
-               local safezone = shakeUI:FindFirstChild("safezone")
-               if safezone then
-                  local button = safezone:FindFirstChild("button")
-                  if button and button:IsA("ImageButton") and button.Visible then
-                     GuiService.SelectedObject = button
-                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-                  end
-               end
-            end
-            task.wait(0.01) -- Minimal delay to prevent crashing
-         end
-      end)
-   end
-})
-
 -- Auto Drop Bobber Toggle
 MainTab:CreateToggle({
    Name = "Auto Drop Bobber",
@@ -182,59 +164,40 @@ MainTab:CreateToggle({
       _G.AutoDropBobber = v
       spawn(function()
          while _G.AutoDropBobber do
-            task.wait(0.1) -- Adjust delay as needed
+            task.wait(0.1)
             Char = getCharacter()
             local Rod = Char:FindFirstChildOfClass("Tool")
-            if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
-               -- Temporarily unfreeze character if frozen
-               if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = false
-               end
-               -- Fire the cast event (drop bobber)
-               Rod.events.cast:FireServer(100, 1) -- Adjust parameters if needed
-               -- Re-freeze character if needed
-               if _G.FreezeCharacter then
-                  Char.HumanoidRootPart.Anchored = true
-               end
-            end
-         end
-      end)
-   end
-})
-
--- Instant Reel Toggle
-MainTab:CreateToggle({
-   Name = "Instant Reel",
-   Callback = function(v)
-      _G.InstantReel = v
-      spawn(function()
-         while _G.InstantReel do
-            for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-               if v:IsA("ScreenGui") and v.Name == "reel" then
-                  local bar = v:FindFirstChild("bar")
-                  if bar then
-                     -- Fire the reel event instantly
-                     ReplicatedStorage.events.reelfinished:FireServer(100, true)
+            if Rod and Rod:FindFirstChild("events") then
+               local castEvent = Rod.events:FindFirstChild("cast")
+               if castEvent then
+                  if _G.FreezeCharacter then
+                     Char.HumanoidRootPart.Anchored = false
+                  end
+                  castEvent:FireServer(100, 1)
+                  if _G.FreezeCharacter then
+                     Char.HumanoidRootPart.Anchored = true
                   end
                end
             end
-            task.wait(0.01) -- Minimal delay to prevent crashing
          end
       end)
    end
 })
 
+-- Auto Sell Toggle
 local AutoTab = Window:CreateTab("Auto", 124714113910876)
 local AutoSection = AutoTab:CreateSection("Auto")
 
--- Auto Sell Toggle
 AutoTab:CreateToggle({
    Name = "Auto Sell",
    Callback = function(v)
       _G.AutoSell = v
       spawn(function()
          while _G.AutoSell do
-            game:GetService("ReplicatedStorage").events.SellAll:InvokeServer()
+            local sellEvent = ReplicatedStorage:FindFirstChild("events") and ReplicatedStorage.events:FindFirstChild("SellAll")
+            if sellEvent then
+               sellEvent:InvokeServer()
+            end
             task.wait(1.5)
          end
       end)
