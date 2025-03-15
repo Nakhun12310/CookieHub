@@ -14,7 +14,7 @@ end
 warn("Anti-Kick is now active. You cannot be kicked.")
 
 -- Load Rayfield UI
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zepthical/Vayfield/refs/heads/main/README.md'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "🍪 | Cookie Hub",
