@@ -1,18 +1,3 @@
--- Anti-Kick Feature
-local LocalPlayer = game:GetService("Players").LocalPlayer
-
--- Save the original Kick function
-local originalKick = LocalPlayer.Kick
-
--- Override the Kick function
-LocalPlayer.Kick = function(self, ...)
-    warn("Anti-Kick: Attempt to kick player blocked.")
-    return nil -- Block the kick
-end
-
--- Notify the user that anti-kick is active
-warn("Anti-Kick is now active. You cannot be kicked.")
-
 -- Load Rayfield UI
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
