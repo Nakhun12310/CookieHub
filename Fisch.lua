@@ -227,13 +227,16 @@ local AutoTab = Window:CreateTab("Auto", 124714113910876)
 local AutoSection = MainTab:CreateSection("Auto")
 
 -- Add this toggle under the other toggles in the script
-MainTab:CreateToggle({
+AutoTab:CreateToggle({
+AutoTab:CreateToggle({
    Name = "Auto Sell",
    Callback = function(v)
       _G.AutoSell = v
+      spawn(function()
          while _G.AutoSell do
             game:GetService("ReplicatedStorage").events.SellAll:InvokeServer()
             task.wait(1.5)
-        end
+         end
+      end)
    end
 })
