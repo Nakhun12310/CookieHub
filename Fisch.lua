@@ -52,6 +52,8 @@ _G.AutoShake = false
 _G.AutoReel = false
 _G.FreezeCharacter = false
 _G.InstantShake = false
+_G.AutoDropBobber = false
+_G.InstantReel = false
 
 -- Auto Cast Toggle
 MainTab:CreateToggle({
@@ -163,6 +165,55 @@ MainTab:CreateToggle({
                      GuiService.SelectedObject = button
                      VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
                      VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+                  end
+               end
+            end
+            task.wait(0.01) -- Minimal delay to prevent crashing
+         end
+      end)
+   end
+})
+
+-- Auto Drop Bobber Toggle
+MainTab:CreateToggle({
+   Name = "Auto Drop Bobber",
+   Callback = function(v)
+      _G.AutoDropBobber = v
+      spawn(function()
+         while _G.AutoDropBobber do
+            task.wait(0.1) -- Adjust delay as needed
+            Char = getCharacter()
+            local Rod = Char:FindFirstChildOfClass("Tool")
+            if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
+               -- Temporarily unfreeze character if frozen
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = false
+               end
+               -- Fire the cast event (drop bobber)
+               Rod.events.cast:FireServer(100, 1) -- Adjust parameters if needed
+               -- Re-freeze character if needed
+               if _G.FreezeCharacter then
+                  Char.HumanoidRootPart.Anchored = true
+               end
+            end
+         end
+      end)
+   end
+})
+
+-- Instant Reel Toggle
+MainTab:CreateToggle({
+   Name = "Instant Reel",
+   Callback = function(v)
+      _G.InstantReel = v
+      spawn(function()
+         while _G.InstantReel do
+            for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+               if v:IsA("ScreenGui") and v.Name == "reel" then
+                  local bar = v:FindFirstChild("bar")
+                  if bar then
+                     -- Fire the reel event instantly
+                     ReplicatedStorage.events.reelfinished:FireServer(100, true)
                   end
                end
             end
