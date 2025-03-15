@@ -145,6 +145,7 @@ MainTab:CreateToggle({
                   if bar then
                      local playerbar = bar:FindFirstChild("playerbar")
                      playerbar.Size = UDim2.new(1, 0, 1, 0)
+                     task.wait(0.01)
                      ReplicatedStorage.events.reelfinished:FireServer(100, true)
                   end
                end
@@ -206,6 +207,7 @@ MainTab:CreateToggle({
                   end
                end
             end
+            task.wait(0.01)
          end
       end)
    end
@@ -230,7 +232,7 @@ MainTab:CreateToggle({
                        game:GetService("Players").LocalPlayer.Character:FindFirstChild(Rod).events.reset:FireServer()
                        task.wait(0.01)
                        game:GetService("Players").LocalPlayer.Character:FindFirstChild(Rod).events.reset:FireServer()
-                       task.wait()
+                       task.wait(0.01)
                        ReplicatedStorage.events.reelfinished:FireServer(100, true)
                        task.wait(0.01)
                        ReplicatedStorage.events.reelfinished:FireServer(100, true)
@@ -238,6 +240,7 @@ MainTab:CreateToggle({
                   end
                end
             end
+            task.wait(0.01)
          end
       end)
    end
