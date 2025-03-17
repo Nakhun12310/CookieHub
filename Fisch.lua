@@ -3,7 +3,7 @@ local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shle
 
 local Window = Rayfield:CreateWindow({
    Name = "🍪 | Cookie Hub",
-   Icon = 0,
+   Icon = 124714113910876,
    LoadingTitle = "Loading, please wait...",
    LoadingSubtitle = "by Nakhun12310",
    Theme = "Default",
@@ -41,7 +41,11 @@ local GuiService = game:GetService("GuiService")
 
 -- Ensure Character Loads Properly
 local function getCharacter()
-   return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+   local character = LocalPlayer.Character
+   if not character then
+       character = LocalPlayer.CharacterAdded:Wait()
+   end
+   return character
 end
 
 local Char = getCharacter()
@@ -197,6 +201,8 @@ AutoTab:CreateToggle({
             local sellEvent = ReplicatedStorage:FindFirstChild("events") and ReplicatedStorage.events:FindFirstChild("SellAll")
             if sellEvent then
                sellEvent:InvokeServer()
+            else
+               warn("Sell event not found.")
             end
             task.wait(1.5)
          end
