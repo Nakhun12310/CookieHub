@@ -122,7 +122,7 @@ MainTab:CreateToggle({
       _G.AutoReel = v
       spawn(function()
          while _G.AutoReel do
-            task.wait(0.15)
+            task.wait(0.01)
             for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
                if v:IsA("ScreenGui") and v.Name == "reel" then
                   local bar = v:FindFirstChild("bar")
