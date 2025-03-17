@@ -397,18 +397,4 @@ TeleportTab:CreateDropdown({
 
 
 
--- [[ local SettingsTab = Window:CreateTab("Settings", 124714113910876)
-local SettingsSection = SettingsTab:CreateSection("Save")
-
-local Save = SettingsTab:CreateToggle({
-   Name = "Save",
-   CurrentValue = false,
-   Flag = "Save",
-   Callback = function(Value)
-     while Value do
-         task.wait(5)
-         Rayfield:LoadConfiguration()
-      end
-   end,
-}) ]]
 Rayfield:LoadConfiguration()
