@@ -331,11 +331,11 @@ local TeleportTab = Window:CreateTab("Teleport", 124714113910876)
 local IslandsSection = TeleportTab:CreateSection("Islands")
 
 local Islands = {
-  "Moosewood", "Statue", "Forsaken", "RoslitBay", "GrandReef", "AncientArchivesDoor", 
+  "None", "Moosewood", "Statue", "Forsaken", "RoslitBay", "GrandReef", "AncientArchivesDoor", 
   "Altar", "DesolateDeep", "SnowCap", "Mushgrove", "CalmZone", "TheDepths", 
   "ForsakenShores", "Terrapin", "Sunstone", "TheArch", "Brine", "CraftTable", 
   "Spike", "Vertigo", "Ancient", "NorthEXP", "ChallengerDeep", "VolcanicVent", 
-  "AbyssalZenith", "Atlantis", "EtherealPuzzle", "FinalPuzNorthEXP", "None"
+  "AbyssalZenith", "Atlantis", "EtherealPuzzle", "FinalPuzNorthEXP" 
 }
 
 local coordinates = {
@@ -375,7 +375,6 @@ TeleportTab:CreateDropdown({
    Options = Islands,
    CurrentOption = {"None"},
    MultipleOptions = false,
-   Flag = "IslandDropdown",
    Callback = function(Options)
       local selectedIsland = Options[1]  -- Get the selected island name
       local Player = game.Players.LocalPlayer
@@ -396,8 +395,6 @@ TeleportTab:CreateDropdown({
    end
 })
 
-local Tab = Window:CreateTab("Settings", 124714113910876)
-local SettingsSection = SettingsTab:CreateSection("Save")
 
 
 local SettingsTab = Window:CreateTab("Settings", 124714113910876)
