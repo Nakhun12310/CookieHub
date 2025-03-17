@@ -180,7 +180,7 @@ MainTab:CreateToggle({
        _G.AutoShake = v
        spawn(function()
           while _G.AutoShake do
-             task.wait(0.01)
+             task.wait(0.001)
              local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
              local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
              if shakeUI and shakeUI.Enabled then
@@ -206,7 +206,7 @@ MainTab:CreateToggle({
         _G.AutoReel = v
         spawn(function()
             while _G.AutoReel do
-                task.wait(0.15)
+                task.wait(0.01)
                 local Rod = Char:FindFirstChildOfClass("Tool")
                 if Rod and Rod:FindFirstChild("values") and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
                     if Rod.values:FindFirstChild("bites") and Rod.values.bites.Value then
@@ -271,7 +271,7 @@ MainTab:CreateToggle({
           while _G.InstantShake do
              Shake()
              Shake2()
-             task.wait(0.01)
+             task.wait(0.001)
           end
        end)
     end
@@ -287,7 +287,7 @@ MainTab:CreateToggle({
         _G.InstantReel = v
         spawn(function()
             while _G.InstantReel do
-                task.wait(0.13)
+                task.wait(0.001)
                 local LocalPlayer = game:GetService("Players").LocalPlayer
                 local Char = LocalPlayer.Character
                 local ReplicatedStorage = game:GetService("ReplicatedStorage")
