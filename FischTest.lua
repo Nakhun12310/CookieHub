@@ -28,7 +28,7 @@ local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zept
  
  Rayfield:Notify({
     Title = "Welcome to Cookie Hub!",
-    Content = "Enjoy Your Scripts!",
+    Content = "Don't forget to save the configs! [Settings]",
     Duration = 6.5,
     Image = 124714113910876,
  })
@@ -92,7 +92,6 @@ end
  _G.AutoShake = false
  _G.AutoReel = false
  _G.FreezeCharacter = false
- _G.InstantShake = false
  _G.AutoDropBobber = false
  _G.InstantReel = false
  
@@ -101,6 +100,7 @@ end
  -- Freeze Character Toggle
  MainTab:CreateToggle({
     Name = "Freeze Character",
+    Flag = "FChar",
     Callback = function(v)
        _G.FreezeCharacter = v
        spawn(function()
@@ -122,121 +122,112 @@ end
  
  local MainSection = MainTab:CreateSection("Main")
  
+local function getRod()
+    local Char = LocalPlayer.Character
+    if Char then
+        return Char:FindFirstChildOfClass("Tool")
+    end
+    return nil
+end
+
+local function Cast()
+    local Char = game:GetService("Players").LocalPlayer.Character
+    if not Char then return end
+
+    local Rod = Char:FindFirstChildOfClass("Tool") -- Finds the fishing rod
+    if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
+        Rod.events.cast:FireServer(100, 1)
+    else
+        warn("Rod or cast event not found!")
+    end
+end
+
 -- Auto Cast Toggle
 MainTab:CreateToggle({
     Name = "Auto Cast",
+    Flag = "ACast",
     Callback = function(v)
         _G.AutoCast = v
         spawn(function()
             while _G.AutoCast do
                 task.wait(0.1)
-                local LocalPlayer = game:GetService("Players").LocalPlayer
-                local Char = LocalPlayer.Character
-                local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-                if Char then
-                    local Rod = Char:FindFirstChildOfClass("Tool")  -- Find the rod tool
-                    if Rod and Rod:FindFirstChild("events") then
-                        local castEvent = Rod.events:FindFirstChild("cast")  -- Get the cast event
-                        if castEvent then
-                            local RodValues = Rod:FindFirstChild("values")  -- Get rod values
-                            if RodValues and RodValues:FindFirstChild("casted") then
-                                if RodValues.casted.Value == true then
-                                    -- Handle freeze character setting
-                                    if _G.FreezeCharacter then
-                                        Char.HumanoidRootPart.Anchored = false
-                                    end
-                                    
-                                    -- Fire the cast event with proper parameters
-                                    castEvent:FireServer(100, 1)
-                                    
-                                    -- Re-freeze character if needed
-                                    if _G.FreezeCharacter then
-                                        Char.HumanoidRootPart.Anchored = true
-                                    end
-                                end
-                            else
-                                warn("rodvalues or casted value not found")
-                            end
-                        else
-                            warn("cast not found in rod")
-                        end
-                    else
-                        warn("rod or remotes not found")
+                local Rod = getRod()
+                if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("casted") then
+                    if Rod.values.casted.Value == false then
+                        Cast()
                     end
                 else
-                    warn("char not found")
+                    warn("rod is missing egypt properties.")
                 end
             end
         end)
     end
 })
 
+
+
  
- -- Auto Shake Toggle
  MainTab:CreateToggle({
     Name = "Auto Shake",
+    Flag = "AShake",
     Callback = function(v)
-       _G.AutoShake = v
+    _G.AutoShake = v
        spawn(function()
           while _G.AutoShake do
-             task.wait(0.001)
-             local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
-             local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
-             if shakeUI and shakeUI.Enabled then
-                local safezone = shakeUI:FindFirstChild("safezone")
-                if safezone then
-                   local button = safezone:FindFirstChild("button")
-                   if button and button:IsA("ImageButton") and button.Visible then
-                      GuiService.SelectedObject = button
-                      VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                      VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-                   end
-                end
-             end
+             Shake()
+             Shake2()
+             task.wait(0.01)
           end
        end)
     end
  })
- 
+
+local function Reel()
+      task.wait(0.15)
+      for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+      if v:IsA("ScreenGui") and v.Name == "reel" then
+       local bar = v:FindFirstChild("bar")
+       if bar and ReplicatedStorage:FindFirstChild("events") then
+         local playerbar = bar:FindFirstChild("playerbar")
+         if playerbar then
+           playerbar.Size = UDim2.new(1, 0, 1, 0)
+           local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
+           if reelFinished then
+             reelFinished:FireServer(100, true)
+          end   
+        end
+      end
+    end
+  end
+end
+
+
 -- Auto Reel Toggle
 MainTab:CreateToggle({
     Name = "Auto Reel",
+    Flag = "AReel",
     Callback = function(v)
         _G.AutoReel = v
         spawn(function()
             while _G.AutoReel do
-                task.wait(0.01)
-                local Rod = Char:FindFirstChildOfClass("Tool")
-                if Rod and Rod:FindFirstChild("values") and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
-                    if Rod.values:FindFirstChild("bites") and Rod.values.bites.Value then
-                        for _, gui in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-                            if gui:IsA("ScreenGui") and gui.Name == "reel" then
-                                local bar = gui:FindFirstChild("bar")
-                                if bar then
-                                    local playerbar = bar:FindFirstChild("playerbar")
-                                    if playerbar then
-                                        playerbar.Size = UDim2.new(1, 0, 1, 0)
-                                        task.wait(0.01)
-                                        ReplicatedStorage.events.reelfinished:FireServer(100, true)
-                                    end
-                                end
-                            end
-                        end
+                task.wait(0.1)
+                local Rod = getRod()
+                if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
+                    if Rod.values.bite.Value == true then  -- Only reel if fish is biting
+                        Reel()
                     end
                 end
-                if not _G.AutoReel then break end
             end
         end)
     end
 })
 
- 
  
  
  -- Auto Drop Bobber Toggle
  MainTab:CreateToggle({
     Name = "Auto Drop Bobber",
+    Flag = "DropBob",
     Callback = function(v)
        _G.AutoDropBobber = v
        spawn(function()
@@ -262,56 +253,49 @@ MainTab:CreateToggle({
  })
  
  local Divider = MainTab:CreateDivider()
- 
- MainTab:CreateToggle({
-    Name = "Instant Shake",
-    Callback = function(v)
-    _G.InstantShake = v
-       spawn(function()
-          while _G.InstantShake do
-             Shake()
-             Shake2()
-             task.wait(0.001)
-          end
-       end)
-    end
- })
- 
- 
- 
- 
+
+ local function Reset()
+  local Rod = Char and Char:FindFirstChildOfClass("Tool")
+  if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
+     task.wait(0.1)
+     Rod.events.reset:FireServer()
+  end                              
+end
+
+
 -- Instant Reel Toggle
 MainTab:CreateToggle({
-    Name = "Instant Reel",
+    Name = "Instant Reel[In-dev]",
+    Flag = "InsReel",
     Callback = function(v)
         _G.InstantReel = v
         spawn(function()
             while _G.InstantReel do
-                task.wait(0.001)
-                local LocalPlayer = game:GetService("Players").LocalPlayer
-                local Char = LocalPlayer.Character
-                local ReplicatedStorage = game:GetService("ReplicatedStorage")
+                task.wait(0.1)
+                local Rod = getRod()
+                if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
+                    if Rod.values.bite.Value == true then  -- Only instant reel if fish is biting
+                        Reset()
+                        task.wait(0.03)
+                        Reset()
+                        task.wait(0.01)
 
-                for _, gui in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-                    if gui:IsA("ScreenGui") and gui.Name == "reel" then
-                        local bar = gui:FindFirstChild("bar")
-                        if bar then
-                            local playerbar = bar:FindFirstChild("playerbar")
-                            if playerbar then
-                                playerbar.Size = UDim2.new(1, 0, 1, 0)
-                            end
-                        end
-
-                        local Rod = Char and Char:FindFirstChildOfClass("Tool")
-                        if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
-                            local RodValues = Rod:FindFirstChild("values")
-                            if Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bites") and Rod.values.bites.Value then
-                                task.wait(0.2)
-                                Rod.events.reset:FireServer()
-                                task.wait(0.01)
-                                Rod.events.reset:FireServer()
-                                task.wait(0.01)
-                                ReplicatedStorage.events.reelfinished:FireServer(100, true)
+                        local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
+                        local reelUI = PlayerGUI and PlayerGUI:FindFirstChild("reel")
+                        if reelUI then
+                            local bar = reelUI:FindFirstChild("bar")
+                            if bar then
+                                local playerbar = bar:FindFirstChild("playerbar")
+                                if playerbar then
+                                    playerbar.Size = UDim2.new(1, 0, 1, 0)
+                                    task.wait(0.02)
+                                    local reelFinished = ReplicatedStorage:FindFirstChild("events") and ReplicatedStorage.events:FindFirstChild("reelfinished")
+                                    if reelFinished then
+                                        reelFinished:FireServer(100, true)
+                                        task.wait(0.04)
+                                        reelFinished:FireServer(100, true)
+                                    end
+                                end
                             end
                         end
                     end
@@ -320,7 +304,6 @@ MainTab:CreateToggle({
         end)
     end
 })
-
  
  
  
@@ -329,6 +312,7 @@ MainTab:CreateToggle({
  
 AutoTab:CreateToggle({
     Name = "Auto Sell",
+    Flag = "ASell",
     Callback = function(v)
         _G.AutoSell = v
         spawn(function()
@@ -351,7 +335,7 @@ local Islands = {
   "Altar", "DesolateDeep", "SnowCap", "Mushgrove", "CalmZone", "TheDepths", 
   "ForsakenShores", "Terrapin", "Sunstone", "TheArch", "Brine", "CraftTable", 
   "Spike", "Vertigo", "Ancient", "NorthEXP", "ChallengerDeep", "VolcanicVent", 
-  "AbyssalZenith"
+  "AbyssalZenith", "Atlantis", "EtherealPuzzle", "FinalPuzNorthEXP", "None"
 }
 
 local coordinates = {
@@ -379,27 +363,54 @@ local coordinates = {
   NorthEXP = Vector3.new(-19990, 1136, 5536),
   ChallengerDeep = Vector3.new(-735, 3360, 1684),
   VolcanicVent = Vector3.new(-3181, 2036, 4017),
-  AbyssalZenith = Vector3.new(-13550, 11050, 123)
+  AbyssalZenith = Vector3.new(-13550, 11050, 123),
+  Atlantis = Vector3.new(-4263, -603, 1829),
+  EtherealPuzzle = Vector3.new(-4122, 602, 1820),
+  FinalPuzNorthEXP = Vector3.new(19963, 1137, 5401)
 }
 
 -- Create the dropdown for teleportation
 TeleportTab:CreateDropdown({
    Name = "Select Island",
-   Options = Islands,  -- List of island names
-   CurrentOption = {"Moosewood"},  -- Default selected option
+   Options = Islands,
+   CurrentOption = {"None"},
    MultipleOptions = false,
-   Flag = "IslandDropdown",  -- Unique flag to store the dropdown configuration
+   Flag = "IslandDropdown",
    Callback = function(Options)
-      local selectedIsland = Options[1]  -- Get the selected island
-      if coordinates[selectedIsland] then
-         game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(coordinates[selectedIsland]))  -- Teleport
+      local selectedIsland = Options[1]  -- Get the selected island name
+      local Player = game.Players.LocalPlayer
+      if Player and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+         if selectedIsland == "None" then
+            -- Set "None" to the player's current position
+            coordinates["None"] = Player.Character.HumanoidRootPart.Position
+         end
+
+         if coordinates[selectedIsland] then
+            Player.Character.HumanoidRootPart.CFrame = CFrame.new(coordinates[selectedIsland])  -- Teleport player
+         else
+            warn("No coordinates found for the selected island!")
+         end
+      else
+         warn("Player or HumanoidRootPart not found!")
       end
    end
 })
 
+local Tab = Window:CreateTab("Settings", 124714113910876)
+local SettingsSection = SettingsTab:CreateSection("Save")
 
 
+local SettingsTab = Window:CreateTab("Settings", 124714113910876)
+local SettingsSection = SettingsTab:CreateSection("Save")
 
-
-
-Rayfield:LoadConfiguration()
+local Save = SettingsTab:CreateToggle({
+   Name = "Save",
+   CurrentValue = false,
+   Flag = "Save",
+   Callback = function(Value)
+     while Value do
+         task.wait(5)
+         Rayfield:LoadConfiguration()
+      end
+   end,
+})
