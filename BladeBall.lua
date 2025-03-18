@@ -1,24 +1,58 @@
 -- Get Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager") -- For simulating clicks
+
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local RootPart = Character:WaitForChild("HumanoidRootPart")
 
--- Ball Detection Settings
-local Ball = nil  -- This will hold the ball object when detected
-local ParryDistance = 10 -- Distance at which the parry should trigger
+-- Load Vayfield GUI
+local Vayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/zepthical/Vayfield/main/source.lua"))()
 
--- Create the Indicator Part (Circle)
-local Indicator = Instance.new("Part")
-Indicator.Shape = Enum.PartType.Ball
-Indicator.Size = Vector3.new(5, 5, 5) -- Make it a circle
-Indicator.Color = Color3.fromRGB(255, 0, 0) -- Default: Red (Wait)
-Indicator.Material = Enum.Material.Neon
-Indicator.Anchored = true
-Indicator.CanCollide = false
-Indicator.Parent = game.Workspace
+-- Create GUI Window
+local Window = Vayfield:CreateWindow({
+    Name = "Auto Parry Script",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "By YourName",
+    ConfigurationSaving = {
+        Enabled = false, -- Set true if you want to save settings
+        FolderName = nil,
+        FileName = "AutoParryConfig"
+    },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
 
--- Function to Detect the Ball in the Game
+-- Toggle for Auto Parry
+local AutoParryEnabled = false
+local Toggle = Window:CreateToggle({
+    Name = "Enable Auto Parry",
+    CurrentValue = false,
+    Flag = "AutoParry", 
+    Callback = function(Value)
+        AutoParryEnabled = Value
+    end
+})
+
+-- Slider for Parry Distance
+local ParryDistance = 10
+local Slider = Window:CreateSlider({
+    Name = "Parry Distance",
+    Range = {1, 20}, 
+    Increment = 1,
+    Suffix = "Studs",
+    CurrentValue = 10,
+    Flag = "ParryDistance",
+    Callback = function(Value)
+        ParryDistance = Value
+    end
+})
+
+-- Ball Detection
+local Ball = nil
+
 function FindBall()
     for _, obj in pairs(workspace:GetChildren()) do
         if obj:IsA("Part") and obj.Name == "Ball" then
@@ -26,31 +60,39 @@ function FindBall()
             return
         end
     end
+    Ball = nil -- Reset if no ball is found
 end
 
--- Function to Auto-Parry When the Ball is Close
+-- Create Indicator (Floating Circle)
+local Indicator = Instance.new("Part")
+Indicator.Shape = Enum.PartType.Ball
+Indicator.Size = Vector3.new(5, 5, 5)
+Indicator.Color = Color3.fromRGB(255, 0, 0) -- Default Red
+Indicator.Material = Enum.Material.Neon
+Indicator.Anchored = true
+Indicator.CanCollide = false
+Indicator.Parent = game.Workspace
+
+-- Auto Parry Function
 function AutoParry()
-    if Ball and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local playerPos = LocalPlayer.Character.HumanoidRootPart.Position
+    if AutoParryEnabled and Ball and RootPart then
+        local playerPos = RootPart.Position
         local ballPos = Ball.Position
         local distance = (playerPos - ballPos).Magnitude
 
         -- Update Indicator Position
-        Indicator.Position = playerPos + Vector3.new(0, 3, 0) -- Keep it floating above player
+        Indicator.Position = playerPos + Vector3.new(0, 3, 0)
 
         -- Change Indicator Color Based on Distance
         if distance > ParryDistance then
             Indicator.Color = Color3.fromRGB(255, 0, 0) -- Red (Wait)
         else
             Indicator.Color = Color3.fromRGB(0, 255, 0) -- Green (Ready)
-            
+
             -- Perform Auto Click / Parry
-            task.spawn(function()
-                while distance <= ParryDistance do
-                    mouse1click() -- Simulate mouse click
-                    task.wait(0.00000001) -- Super fast reaction
-                end
-            end)
+            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+            task.wait(0.01)
+            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
         end
     end
 end
