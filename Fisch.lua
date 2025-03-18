@@ -115,7 +115,7 @@ MainTab:CreateToggle({
    end
 })
 
--- Auto Reel Toggle
+-- Auto Reel Toggle (Fixed)
 MainTab:CreateToggle({
    Name = "Auto Reel",
    Callback = function(v)
@@ -123,13 +123,22 @@ MainTab:CreateToggle({
       spawn(function()
          while _G.AutoReel do
             task.wait(0.01)
-            for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-               if v:IsA("ScreenGui") and v.Name == "reel" then
-                  local bar = v:FindFirstChild("bar")
-                  if bar and ReplicatedStorage:FindFirstChild("events") then
-                     local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
-                     if reelFinished then
-                        reelFinished:FireServer(100, true)
+            -- Wait for PlayerGui to load
+            local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+            if not PlayerGui then
+               PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+            end
+
+            -- Ensure PlayerGui is not nil before iterating
+            if PlayerGui then
+               for _, v in pairs(PlayerGui:GetChildren()) do
+                  if v:IsA("ScreenGui") and v.Name == "reel" then
+                     local bar = v:FindFirstChild("bar")
+                     if bar and ReplicatedStorage:FindFirstChild("events") then
+                        local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
+                        if reelFinished then
+                           reelFinished:FireServer(100, true)
+                        end
                      end
                   end
                end
