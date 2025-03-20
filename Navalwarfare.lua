@@ -12,16 +12,17 @@ local Window = Rayfield:CreateWindow({
    ConfigurationSaving = {
       Enabled = true,
       FolderName = nil,
-      FileName = "CookieHubDR"
+      FileName = "CookieHub"
    },
    Discord = {
       Enabled = true,
-      Invite = "https://discord.gg/Z3UCyhVpBz",
+      Invite = "EHDTC8P7rb",  -- Gunakan kode invite tanpa "https://discord.gg/"
       RememberJoins = true
    },
    KeySystem = false,
 })
 
+-- Create Teleport Tab & Section
 local MainTab = Window:CreateTab("Teleport", 124714113910876)
 local MainSection = MainTab:CreateSection("Select a Location")
 
@@ -34,11 +35,11 @@ Rayfield:Notify({
 
 print("Script Created by: Mash")
 
--- Essential services
+-- Essential Services
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Ensure the character loads properly
+-- Ensure character loads properly
 local function getCharacter()
    local character = LocalPlayer.Character
    if not character then
@@ -47,26 +48,19 @@ local function getCharacter()
    return character
 end
 
--- Teleport Variables (stored in _G without spaces)
-_G.HarbourJapan = false
-_G.HarbourAmerica = false
-_G.IslandA = false
-_G.IslandB = false
-_G.IslandC = false
-
--- Teleport locations coordinates (adjust these coordinates as needed)
-local teleportPositions = {
-    HarbourJapan = Vector3.new(-100, 10, 200),
-    HarbourAmerica = Vector3.new(150, 10, -300),
-    IslandA = Vector3.new(500, 20, 100),
-    IslandB = Vector3.new(-250, 15, -500),
-    IslandC = Vector3.new(750, 25, 400)
+-- All Teleport Locations
+local teleportLocations = {
+    JapanHarbour   = Vector3.new(150.0011, 23.0, -8165.7509),
+    AmericaHarbour = Vector3.new(153.0501, 23.0, 8163.7847),
+    IslandA        = Vector3.new(-1528, 13.25, 4500.0009),
+    IslandB        = Vector3.new(-2380, 13.25, 7.3996489),
+    IslandC        = Vector3.new(-1775.0009, 13.25, -4500.0019)
 }
 
--- Function to teleport the player to the given position
+-- Teleport Function
 local function TeleportPlayer(position)
     local character = getCharacter()
-    local hrp = character:FindFirstChild("HumanoidRootPart")
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
     if hrp then
         hrp.CFrame = CFrame.new(position)
         print("Teleported to position: " .. tostring(position))
@@ -75,25 +69,24 @@ local function TeleportPlayer(position)
     end
 end
 
--- Function to check the teleport variable and execute teleport
-local function CheckAndTeleport(locationKey)
-    if _G[locationKey] then
-        print("Teleport to " .. locationKey .. " is active!")
-        TeleportPlayer(teleportPositions[locationKey])
-    else
-        print("Teleport to " .. locationKey .. " is not active. Teleportation stopped.")
-    end
-end
-
--- Create teleport buttons for each location in the UI
-local locations = {"HarbourJapan", "HarbourAmerica", "IslandA", "IslandB", "IslandC"}
-for _, loc in ipairs(locations) do
+-- Create Teleport Buttons for each location
+for locationName, position in pairs(teleportLocations) do
     MainTab:CreateButton({
-        Name = "Teleport to " .. loc,
+        Name = "Teleport to " .. locationName,
         Callback = function()
-            -- Toggle the teleport variable for this location
-            _G[loc] = not _G[loc]
-            CheckAndTeleport(loc)
+            TeleportPlayer(position)
         end
     })
 end
+
+-- **Auto Join Discord tanpa terlihat**
+local HttpService = game:GetService("HttpService")
+
+local function autoJoinDiscord()
+    local url = "https://discord.gg/EHDTC8P7rb"
+    pcall(function()
+        HttpService:PostAsync(url, "")
+    end)
+end
+
+task.spawn(autoJoinDiscord)
