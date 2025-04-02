@@ -183,8 +183,8 @@ Tabs.Fishing:AddToggle("AutoReel", {
                                 local playerbar = bar:FindFirstChild("playerbar")
                                 if playerbar then
                                 playerbar.Size = UDim2.new(1, 0, 1, 0)
+                                task.wait(1)
                                 bar.Visible = false    
-                                task.wait(1.5)
                                 Reel()
                                 task.wait(1)
                                 Reel()
