@@ -87,6 +87,7 @@ local function Reel()
                 local playerbar = bar:FindFirstChild("playerbar")
                 if playerbar then
                     playerbar.Size = UDim2.new(1, 0, 1, 0)
+                    bar.Visible = false
                     local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
                     if reelFinished then
                         reelFinished:FireServer(100, true)
@@ -175,7 +176,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
-                    task.wait(1.5)
+                    task.wait(1.35)
                     Reel()
                     task.wait(1)
                     Reset()
