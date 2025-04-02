@@ -1,32 +1,14 @@
--- 🍪 Cookie Hub (Fluent UI) - Full Script
+-- 🍪 Cookie Hub (Fluent UI) - Complete Script
 -- by Zepthical
 
--- Load Fluent UI (Updated Working Link)
-local Fluent, SaveManager, InterfaceManager
-
-local function loadLibrary(url)
-    local success, result = pcall(function()
-        return loadstring(game:HttpGet(url, true))()
-    end)
-    return success and result or nil
-end
-
-Fluent = loadLibrarylocal Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-if not Fluent then
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Error",
-        Text = "Failed to load Fluent UI",
-        Duration = 5
-    })
-    return
-end
-
-SaveManager = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/addons/SaveManager.lua")
-InterfaceManager = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/addons/InterfaceManager.lua")
+-- Load Fluent UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 -- Create Window
 local Window = Fluent:CreateWindow({
-    Title = "🍪 Cookie Hub DEV",
+    Title = "🍪 Cookie Hub "..Fluent.Version,
     SubTitle = "by Zepthical",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -35,20 +17,19 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.RightControl
 })
 
--- Tabs
-local Tabs = {
-    Main = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" }),
-    Auto = Window:AddTab({ Title = "Auto", Icon = "settings" }),
-    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
-    Misc = Window:AddTab({ Title = "Misc", Icon = "sliders" })
-}
-
 -- Services
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Tabs
+local Tabs = {
+    Fishing = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
+}
 
 -- States
 local States = {
@@ -56,12 +37,11 @@ local States = {
     AutoShake = false,
     AutoReel = false,
     InstantReel = false,
-    FreezeChar = false,
     AutoEquipRod = false,
+    FreezeChar = false,
     AutoSell = false,
     WalkOnWater = false,
-    NoClip = false,
-    HideIdentity = false
+    NoClip = false
 }
 
 -- Fishing Functions
@@ -130,13 +110,13 @@ local function Reset()
     end
 end
 
--- Main Tab (Fishing)
-Tabs.Main:AddParagraph({
+-- Fishing Tab
+Tabs.Fishing:AddParagraph({
     Title = "Fishing Automation",
     Content = "Auto-fishing features"
 })
 
-Tabs.Main:AddToggle("AutoEquipToggle", {
+Tabs.Fishing:AddToggle("AutoEquip", {
     Title = "Auto Equip Rod",
     Default = States.AutoEquipRod,
     Callback = function(Value)
@@ -157,7 +137,7 @@ Tabs.Main:AddToggle("AutoEquipToggle", {
     end
 })
 
-Tabs.Main:AddToggle("AutoCastToggle", {
+Tabs.Fishing:AddToggle("AutoCast", {
     Title = "Auto Cast",
     Default = States.AutoCast,
     Callback = function(Value)
@@ -172,7 +152,7 @@ Tabs.Main:AddToggle("AutoCastToggle", {
     end
 })
 
-Tabs.Main:AddToggle("AutoShakeToggle", {
+Tabs.Fishing:AddToggle("AutoShake", {
     Title = "Auto Shake",
     Default = States.AutoShake,
     Callback = function(Value)
@@ -184,7 +164,7 @@ Tabs.Main:AddToggle("AutoShakeToggle", {
     end
 })
 
-Tabs.Main:AddToggle("AutoReelToggle", {
+Tabs.Fishing:AddToggle("AutoReel", {
     Title = "Auto Reel",
     Default = States.AutoReel,
     Callback = function(Value)
@@ -205,29 +185,42 @@ Tabs.Main:AddToggle("AutoReelToggle", {
     end
 })
 
-Tabs.Main:AddToggle("InstantReelToggle", {
-    Title = "Instant Reel",
-    Default = States.InstantReel,
+-- Player Tab
+local walkSpeed = 16
+local jumpPower = 50
+
+Tabs.Player:AddSlider("WalkSpeed", {
+    Title = "Walk Speed",
+    Default = walkSpeed,
+    Min = 16,
+    Max = 100,
+    Rounding = 1,
     Callback = function(Value)
-        States.InstantReel = Value
-        while States.InstantReel do
-            local rod = getRod()
-            if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
-                if rod.values.bite.Value then
-                    task.wait(1.2)
-                    Reel()
-                    task.wait(0.5)
-                    Reset()
-                    repeat task.wait(0.1) until not rod.values.bite.Value
-                end
-            end
-            task.wait(0.1)
+        walkSpeed = Value
+        local char = getCharacter()
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = Value
         end
     end
 })
 
--- Auto Tab
-Tabs.Auto:AddToggle("AutoSellToggle", {
+Tabs.Player:AddSlider("JumpPower", {
+    Title = "Jump Power",
+    Default = jumpPower,
+    Min = 50,
+    Max = 200,
+    Rounding = 1,
+    Callback = function(Value)
+        jumpPower = Value
+        local char = getCharacter()
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.JumpPower = Value
+        end
+    end
+})
+
+-- Misc Tab
+Tabs.Misc:AddToggle("AutoSell", {
     Title = "Auto Sell Items",
     Default = States.AutoSell,
     Callback = function(Value)
@@ -240,38 +233,7 @@ Tabs.Auto:AddToggle("AutoSellToggle", {
     end
 })
 
--- Player Tab
-local walkSpeed = 16
-local jumpPower = 50
-
-Tabs.Player:AddInput("WalkSpeedInput", {
-    Title = "Walk Speed",
-    Default = tostring(walkSpeed),
-    Numeric = true,
-    Callback = function(Value)
-        walkSpeed = tonumber(Value) or 16
-        local char = getCharacter()
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.WalkSpeed = walkSpeed
-        end
-    end
-})
-
-Tabs.Player:AddInput("JumpPowerInput", {
-    Title = "Jump Power",
-    Default = tostring(jumpPower),
-    Numeric = true,
-    Callback = function(Value)
-        jumpPower = tonumber(Value) or 50
-        local char = getCharacter()
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.JumpPower = jumpPower
-        end
-    end
-})
-
--- Misc Tab
-Tabs.Misc:AddToggle("NoClipToggle", {
+Tabs.Misc:AddToggle("NoClip", {
     Title = "NoClip",
     Default = States.NoClip,
     Callback = function(Value)
@@ -305,18 +267,11 @@ Tabs.Misc:AddToggle("NoClipToggle", {
 })
 
 -- Initialize UI
-if SaveManager then
-    SaveManager:SetLibrary(Fluent)
-    SaveManager:IgnoreThemeSettings()
-    SaveManager:SetIgnoreIndexes({})
-    SaveManager:Load()
-end
-
-if InterfaceManager then
-    InterfaceManager:SetLibrary(Fluent)
-    InterfaceManager:BuildInterfaceSection(Tabs.Misc)
-    InterfaceManager:Load()
-end
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+InterfaceManager:BuildInterfaceSection(Tabs.Misc)
+SaveManager:BuildConfigSection(Tabs.Misc)
 
 Window:SelectTab(1)
 
