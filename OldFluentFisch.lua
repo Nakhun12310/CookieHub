@@ -42,7 +42,8 @@ local States = {
     FreezeChar = false,
     AutoSell = false,
     WalkOnWater = false,
-    NoClip = false
+    NoClip = false,
+    NoCamShake = false
 }
 
 -- Fishing Functions
@@ -224,10 +225,13 @@ Tabs.Fishing:AddToggle("AutoReel", {
 -- Create Toggle
 Tabs.Main:AddToggle("NoCamShake", {
     Name = "Remove Extra Reels",
-    Default = false,
+    Default = NoCamShake,
     Callback = function(state)
+	States.NoCamShake = state
+	while States.NoCamShake	do
         if state then
             RemoveExtraReels()
+	    task.wait(0.1)
         end
     end
 })
