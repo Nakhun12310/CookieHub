@@ -175,9 +175,9 @@ Tabs.Fishing:AddToggle("AutoReel", {
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
-                    task.wait(1)
+                    task.wait(1.5)
                     Reel()
-                    task.wait(0.5)
+                    task.wait(1)
                     Reset()
                     repeat task.wait(0.1) until not rod.values.bite.Value
                 end
