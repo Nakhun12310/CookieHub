@@ -14,7 +14,7 @@ local Window = Fluent:CreateWindow({
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
     Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.RightControl
+    MinimizeKey = Enum.KeyCode.N
 })
 
 -- Services
@@ -27,6 +27,7 @@ local LocalPlayer = Players.LocalPlayer
 -- Tabs
 local Tabs = {
     Fishing = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" }),
+    Auto = Window:AddTab({ Title = "Auto", Icon = "layers" }),
     Player = Window:AddTab({ Title = "Player", Icon = "user" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
 }
@@ -159,6 +160,7 @@ Tabs.Fishing:AddToggle("AutoShake", {
         States.AutoShake = Value
         while States.AutoShake do
             Shake()
+            Shake()
             task.wait(0.1)
         end
     end
@@ -173,7 +175,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
-                    task.wait(1.85)
+                    task.wait(1)
                     Reel()
                     task.wait(0.5)
                     Reset()
@@ -184,6 +186,21 @@ Tabs.Fishing:AddToggle("AutoReel", {
         end
     end
 })
+
+-- Auto Tab
+Tabs.Auto:AddToggle("AutoSell", {
+    Title = "Auto Sell Items",
+    Default = States.AutoSell,
+    Callback = function(Value)
+        States.AutoSell = Value
+        while States.AutoSell do
+            local SellAll = ReplicatedStorage.events:FindFirstChild("SellAll")
+            if SellAll then SellAll:InvokeServer() end
+            task.wait(1.5)
+        end
+    end
+})
+
 
 -- Player Tab
 local walkSpeed = 16
@@ -220,18 +237,7 @@ Tabs.Player:AddSlider("JumpPower", {
 })
 
 -- Misc Tab
-Tabs.Misc:AddToggle("AutoSell", {
-    Title = "Auto Sell Items",
-    Default = States.AutoSell,
-    Callback = function(Value)
-        States.AutoSell = Value
-        while States.AutoSell do
-            local SellAll = ReplicatedStorage.events:FindFirstChild("SellAll")
-            if SellAll then SellAll:InvokeServer() end
-            task.wait(1.5)
-        end
-    end
-})
+
 
 Tabs.Misc:AddToggle("NoClip", {
     Title = "NoClip",
