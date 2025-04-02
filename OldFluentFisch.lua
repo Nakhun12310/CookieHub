@@ -203,8 +203,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
                                 local playerbar = bar:FindFirstChild("playerbar")
                                 if playerbar then
                                 playerbar.Size = UDim2.new(1, 0, 1, 0)
-                                task.wait(0.85)
-                                bar.Visible = false    
+                                bar.Visible = true   
                                 Reel()
                                 task.wait(1)
                                 Reel()
@@ -222,22 +221,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
--- Create Toggle
-Tabs.Main:AddToggle("NoCamShake", {
-    Name = "Remove Extra Reels",
-    Default = NoCamShake,
-    Callback = function(state)
-	States.NoCamShake = state
-	while States.NoCamShake	do
-        if state then
-            RemoveExtraReels()
-	    task.wait(0.1)		
-	   end		
-        end
-    end
-})
-
---[[Tabs.Main:AddToggle("InstantReel", {
+Tabs.Main:AddToggle("InstantReel", {
     Title = "Instant Reel",
     Default = States.InstantReel,
     Default = function(Value)
@@ -257,7 +241,7 @@ Tabs.Main:AddToggle("NoCamShake", {
          end
        end         
     end            
-}) ]]
+}) 
 -- Auto Tab
 Tabs.Auto:AddToggle("AutoSell", {
     Title = "Auto Sell Items",
