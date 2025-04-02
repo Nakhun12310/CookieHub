@@ -11,7 +11,7 @@ local function loadLibrary(url)
     return success and result or nil
 end
 
-Fluent = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/source.lua")
+Fluent = loadLibrarylocal Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 if not Fluent then
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "Error",
