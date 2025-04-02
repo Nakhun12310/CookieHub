@@ -176,10 +176,22 @@ Tabs.Fishing:AddToggle("AutoReel", {
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
-                    task.wait(1.35)
-                    Reel()
-                    task.wait(1)
-                    Reset()
+                    for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+                         if v:IsA("ScreenGui") and v.Name == "reel" then
+                            local bar = v:FindFirstChild("bar")
+                            if bar and ReplicatedStorage:FindFirstChild("events") then
+                                local playerbar = bar:FindFirstChild("playerbar")
+                                if playerbar then
+                                playerbar.Size = UDim2.new(1, 0, 1, 0)
+                                bar.Visible = false    
+                                task.wait(1.35)
+                                Reel()
+                                task.wait(1)
+                                Reset()
+                             end
+                          end
+                       end
+                    end                    
                     repeat task.wait(0.1) until not rod.values.bite.Value
                 end
             end
