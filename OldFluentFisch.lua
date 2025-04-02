@@ -183,7 +183,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
                                 local playerbar = bar:FindFirstChild("playerbar")
                                 if playerbar then
                                 playerbar.Size = UDim2.new(1, 0, 1, 0)
-                                task.wait(1)
+                                task.wait(0.85)
                                 bar.Visible = false    
                                 Reel()
                                 task.wait(1)
@@ -202,6 +202,27 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
+Tabs.Main:AddToggle("InstantReel", {
+    Title = "Instant Reel",
+    Default = States.InstantReel,
+    Default = function(Value)
+        States.InstantReel = Value
+        while States.InstantReel do
+            task.wait(1) -- Prevent excessive calls
+
+                local Rod = getRod()
+                if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
+                if Rod.values.bite.Value == true then
+			    task.wait(1.2)
+			    Reel()
+			    task.wait(0.5)
+			    Reset()
+               repeat task.wait(0.1) until Rod.values.bite.Value == false
+            end
+         end
+       end         
+    end            
+})
 -- Auto Tab
 Tabs.Auto:AddToggle("AutoSell", {
     Title = "Auto Sell Items",
@@ -215,7 +236,6 @@ Tabs.Auto:AddToggle("AutoSell", {
         end
     end
 })
-
 
 -- Player Tab
 local walkSpeed = 16
