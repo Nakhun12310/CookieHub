@@ -1,11 +1,32 @@
--- Fluent UI Implementation for Cookie Hub
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/addons/InterfaceManager.lua"))()
+-- Cookie Hub DEV - Fluent UI Version
+-- by Zepthical
 
--- Create window with Fluent styling
+-- Load Fluent UI with error handling
+local Fluent, SaveManager, InterfaceManager
+
+local function loadLibrary(url)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(url))()
+    end)
+    return success and result or nil
+end
+
+Fluent = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/source.lua")
+if not Fluent then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Error",
+        Text = "Failed to load Fluent UI Library",
+        Duration = 5
+    })
+    return
+end
+
+SaveManager = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/addons/SaveManager.lua")
+InterfaceManager = loadLibrary("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/addons/InterfaceManager.lua")
+
+-- Create main window
 local Window = Fluent:CreateWindow({
-    Title = "Cookie Hub" .. " " .. "DEV",
+    Title = "Cookie Hub DEV",
     SubTitle = "by Zepthical",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -18,25 +39,31 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "fishing-pole" }),
     Auto = Window:AddTab({ Title = "Auto", Icon = "settings" }),
-    Teleport = Window:AddTab({ Title = "Teleport", Icon = "map-pin" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
     Misc = Window:AddTab({ Title = "Misc", Icon = "sliders" })
 }
 
--- Variables
-local fishingStates = {
+-- Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local GuiService = game:GetService("GuiService")
+local LocalPlayer = Players.LocalPlayer
+
+-- State variables
+local States = {
     AutoCast = false,
     AutoShake = false,
     AutoReel = false,
     InstantReel = false,
     FreezeChar = false,
-    AutoEquipRod = false
+    AutoEquipRod = false,
+    AutoSell = false,
+    WalkOnWater = false,
+    NoClip = false
 }
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- Fishing functions
+-- Fishing Functions
 local function getCharacter()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
@@ -62,10 +89,43 @@ local function Shake()
         if safezone then
             local button = safezone:FindFirstChild("button")
             if button and button:IsA("ImageButton") and button.Visible then
-                game:GetService("GuiService").SelectedObject = button
-                game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+                GuiService.SelectedObject = button
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
             end
+        end
+    end
+end
+
+local function Reel()
+    task.wait(0.2)
+    for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+        if v:IsA("ScreenGui") and v.Name == "reel" then
+            local bar = v:FindFirstChild("bar")
+            if bar and ReplicatedStorage:FindFirstChild("events") then
+                local playerbar = bar:FindFirstChild("playerbar")
+                if playerbar then
+                    playerbar.Size = UDim2.new(1, 0, 1, 0)
+                    local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
+                    if reelFinished then
+                        reelFinished:FireServer(100, true)
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function Reset()
+    local rod = getRod()
+    if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
+        task.wait(0.1)
+        rod.events.reset:FireServer()
+        local equipRemote = ReplicatedStorage.packages.Net:FindFirstChild("RE/Backpack/Equip")
+        if equipRemote then
+            equipRemote:FireServer(rod)
+            task.wait(0.1)
+            equipRemote:FireServer(rod)
         end
     end
 end
@@ -73,22 +133,24 @@ end
 -- Main Tab
 Tabs.Main:AddParagraph({
     Title = "Fishing Automation",
-    Content = "Control all fishing-related automation features"
+    Content = "Control all fishing-related features"
 })
 
-Tabs.Main:AddToggle("AutoEquip", {
+Tabs.Main:AddToggle("AutoEquipToggle", {
     Title = "Auto Equip Rod",
-    Default = fishingStates.AutoEquipRod,
+    Default = States.AutoEquipRod,
     Callback = function(Value)
-        fishingStates.AutoEquipRod = Value
-        while fishingStates.AutoEquipRod do
+        States.AutoEquipRod = Value
+        while States.AutoEquipRod do
             local backpack = LocalPlayer:FindFirstChild("Backpack")
             if backpack then
                 for _, tool in ipairs(backpack:GetChildren()) do
                     if tool:IsA("Tool") and tool:FindFirstChild("events") and tool.events:FindFirstChild("cast") then
-                        local remote = ReplicatedStorage:WaitForChild("packages"):WaitForChild("Net"):WaitForChild("RE/Backpack/Equip")
-                        remote:FireServer(tool)
-                        break
+                        local remote = ReplicatedStorage.packages.Net:FindFirstChild("RE/Backpack/Equip")
+                        if remote then
+                            remote:FireServer(tool)
+                            break
+                        end
                     end
                 end
             end
@@ -97,12 +159,12 @@ Tabs.Main:AddToggle("AutoEquip", {
     end
 })
 
-Tabs.Main:AddToggle("AutoCast", {
+Tabs.Main:AddToggle("AutoCastToggle", {
     Title = "Auto Cast",
-    Default = fishingStates.AutoCast,
+    Default = States.AutoCast,
     Callback = function(Value)
-        fishingStates.AutoCast = Value
-        while fishingStates.AutoCast do
+        States.AutoCast = Value
+        while States.AutoCast do
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("casted") then
                 if not rod.values.casted.Value then
@@ -114,14 +176,68 @@ Tabs.Main:AddToggle("AutoCast", {
     end
 })
 
-Tabs.Main:AddToggle("AutoShake", {
+Tabs.Main:AddToggle("AutoShakeToggle", {
     Title = "Auto Shake",
-    Default = fishingStates.AutoShake,
+    Default = States.AutoShake,
     Callback = function(Value)
-        fishingStates.AutoShake = Value
-        while fishingStates.AutoShake do
+        States.AutoShake = Value
+        while States.AutoShake do
             Shake()
             task.wait(0.1)
+        end
+    end
+})
+
+Tabs.Main:AddToggle("AutoReelToggle", {
+    Title = "Auto Reel",
+    Default = States.AutoReel,
+    Callback = function(Value)
+        States.AutoReel = Value
+        while States.AutoReel do
+            local rod = getRod()
+            if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
+                if rod.values.bite.Value then
+                    task.wait(1.85)
+                    Reel()
+                    task.wait(0.5)
+                    Reset()
+                    repeat task.wait(0.1) until not rod.values.bite.Value
+                end
+            end
+            task.wait(0.1)
+        end
+    end
+})
+
+Tabs.Main:AddToggle("InstantReelToggle", {
+    Title = "Instant Reel",
+    Default = States.InstantReel,
+    Callback = function(Value)
+        States.InstantReel = Value
+        while States.InstantReel do
+            local rod = getRod()
+            if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
+                if rod.values.bite.Value then
+                    task.wait(1.2)
+                    Reel()
+                    task.wait(0.5)
+                    Reset()
+                    repeat task.wait(0.1) until not rod.values.bite.Value
+                end
+            end
+            task.wait(0.1)
+        end
+    end
+})
+
+Tabs.Main:AddToggle("FreezeCharToggle", {
+    Title = "Freeze Character",
+    Default = States.FreezeChar,
+    Callback = function(Value)
+        States.FreezeChar = Value
+        local char = getCharacter()
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.Anchored = Value
         end
     end
 })
@@ -132,11 +248,12 @@ Tabs.Auto:AddParagraph({
     Content = "Various quality-of-life automation"
 })
 
-Tabs.Auto:AddToggle("AutoSell", {
+Tabs.Auto:AddToggle("AutoSellToggle", {
     Title = "Auto Sell Items",
-    Default = false,
+    Default = States.AutoSell,
     Callback = function(Value)
-        while Value do
+        States.AutoSell = Value
+        while States.AutoSell do
             local SellAllEvent = ReplicatedStorage.events:FindFirstChild("SellAll")
             if SellAllEvent then
                 SellAllEvent:InvokeServer()
@@ -146,19 +263,143 @@ Tabs.Auto:AddToggle("AutoSell", {
     end
 })
 
--- Save configuration
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
+-- Player Tab
+Tabs.Player:AddParagraph({
+    Title = "Player Settings",
+    Content = "Adjust player properties"
+})
 
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
+local walkSpeed = 16
+local jumpPower = 50
 
-InterfaceManager:BuildInterfaceSection(Tabs.Misc)
+Tabs.Player:AddInput("WalkSpeedInput", {
+    Title = "Walk Speed",
+    Default = tostring(walkSpeed),
+    Numeric = true,
+    Finished = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num then
+            walkSpeed = num
+            local char = getCharacter()
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = num
+            end
+        end
+    end
+})
 
+Tabs.Player:AddInput("JumpPowerInput", {
+    Title = "Jump Power",
+    Default = tostring(jumpPower),
+    Numeric = true,
+    Finished = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num then
+            jumpPower = num
+            local char = getCharacter()
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.JumpPower = num
+            end
+        end
+    end
+})
+
+-- Misc Tab
+Tabs.Misc:AddParagraph({
+    Title = "Miscellaneous Features",
+    Content = "Additional utility functions"
+})
+
+local waterParts = {}
+
+Tabs.Misc:AddToggle("WalkOnWaterToggle", {
+    Title = "Walk on Water",
+    Default = States.WalkOnWater,
+    Callback = function(Value)
+        States.WalkOnWater = Value
+        if Value then
+            local partSize = 200
+            local numParts = 150
+            local mapSize = 30000
+            local offsetX = mapSize / 2
+            local offsetZ = mapSize / 2
+            
+            for i = 0, numParts - 1 do
+                for j = 0, numParts - 1 do
+                    local waterPart = Instance.new("Part")
+                    waterPart.Size = Vector3.new(partSize, 2, partSize)
+                    waterPart.Position = Vector3.new((i * partSize) - offsetX, 126, (j * partSize) - offsetZ)
+                    waterPart.Anchored = true
+                    waterPart.CanCollide = true
+                    waterPart.Transparency = 0.8
+                    waterPart.Color = Color3.fromRGB(0, 255, 255)
+                    waterPart.Parent = workspace
+                    table.insert(waterParts, waterPart)
+                end
+            end
+        else
+            for _, part in ipairs(waterParts) do
+                part:Destroy()
+            end
+            waterParts = {}
+        end
+    end
+})
+
+Tabs.Misc:AddToggle("NoClipToggle", {
+    Title = "NoClip",
+    Default = States.NoClip,
+    Callback = function(Value)
+        States.NoClip = Value
+        if Value then
+            local function noclipLoop()
+                while States.NoClip do
+                    local char = getCharacter()
+                    if char then
+                        for _, v in pairs(char:GetDescendants()) do
+                            if v:IsA("BasePart") then
+                                v.CanCollide = false
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end
+            coroutine.wrap(noclipLoop)()
+        else
+            local char = getCharacter()
+            if char then
+                for _, v in pairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
+
+-- Initialize SaveManager and InterfaceManager
+if SaveManager then
+    SaveManager:SetLibrary(Fluent)
+    SaveManager:IgnoreThemeSettings()
+    SaveManager:SetIgnoreIndexes({})
+    SaveManager:Load()
+end
+
+if InterfaceManager then
+    InterfaceManager:SetLibrary(Fluent)
+    InterfaceManager:BuildInterfaceSection(Tabs.Misc)
+    InterfaceManager:Load()
+end
+
+-- Select first tab and show notification
 Window:SelectTab(1)
 
 Fluent:Notify({
-    Title = "Cookie Hub",
+    Title = "Cookie Hub DEV",
     Content = "Successfully loaded!",
     Duration = 5
 })
