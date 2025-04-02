@@ -112,6 +112,25 @@ local function Reset()
     end
 end
 
+local function RemoveExtraReels()
+    local player = game.Players.LocalPlayer
+    local playerGui = player:FindFirstChild("PlayerGui")
+    
+    if playerGui then
+        local reels = playerGui:GetChildren()
+        local reelCount = 0
+
+        for _, child in ipairs(reels) do
+            if child.Name == "reel" then
+                reelCount = reelCount + 1
+                if reelCount > 1 then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+
 -- Fishing Tab
 Tabs.Fishing:AddParagraph({
     Title = "Fishing Automation",
@@ -198,6 +217,17 @@ Tabs.Fishing:AddToggle("AutoReel", {
                 end
             end
             task.wait(0.1)
+        end
+    end
+})
+
+-- Create Toggle
+Tabs.Main:AddToggle("NoCamShake", {
+    Name = "Remove Extra Reels",
+    Default = false,
+    Callback = function(state)
+        if state then
+            RemoveExtraReels()
         end
     end
 })
