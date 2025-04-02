@@ -202,7 +202,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
-Tabs.Main:AddToggle("InstantReel", {
+--[[Tabs.Main:AddToggle("InstantReel", {
     Title = "Instant Reel",
     Default = States.InstantReel,
     Default = function(Value)
@@ -222,7 +222,7 @@ Tabs.Main:AddToggle("InstantReel", {
          end
        end         
     end            
-})
+}) ]]
 -- Auto Tab
 Tabs.Auto:AddToggle("AutoSell", {
     Title = "Auto Sell Items",
