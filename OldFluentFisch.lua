@@ -231,7 +231,8 @@ Tabs.Main:AddToggle("NoCamShake", {
 	while States.NoCamShake	do
         if state then
             RemoveExtraReels()
-	    task.wait(0.1)
+	    task.wait(0.1)		
+	   end		
         end
     end
 })
