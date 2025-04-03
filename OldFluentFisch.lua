@@ -43,7 +43,9 @@ local States = {
     AutoSell = false,
     WalkOnWater = false,
     NoClip = false,
-    NoCamShake = false
+    NoCamShake = false,
+    DisableResources = false,
+    HideIdenity = false
 }
 
 -- Fishing Functions
@@ -233,7 +235,9 @@ Tabs.Main:AddToggle("InstantReel", {
                 local Rod = getRod()
                 if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
                 if Rod.values.bite.Value == true then
-			    task.wait(1.2)
+			    task.wait(0.75)
+			    Reel()
+			    task.wait(0.5)
 			    Reel()
 			    task.wait(0.5)
 			    Reset()
@@ -323,6 +327,80 @@ Tabs.Misc:AddToggle("NoClip", {
                     end
                 end
             end
+        end
+    end
+})
+
+local Player = game.Players.LocalPlayer
+local Character = Player and Player.Character
+local Resources = Character and Character:FindFirstChild("Resources")
+local gas = Resources and Resources:FindFirstChild("gas")
+local oxygen = Resources and Resources:FindFirstChild("oxygen")
+local peaksoxygen = Resources and Resources:FindFirstChild("oxygen(peaks)")
+local temp = Resources and Resources:FindFirstChild("temperature")
+local heat = Resources and Resources:FindFirstChild("temperature(heat)")
+
+Tabs.Misc:AddToggle("DisableResources", {
+   Title = "Disable Resources",
+   Default = States.DisableResources,
+   Callback = function(Value)
+      if Value then				
+          gas.Disabled = Value
+          oxygen.Disbaled = Value
+          peaksoxygen.Disabled = Value
+          temp.Disabled = Value
+      	  heat.Disabled = Value
+       end			
+   end
+})
+
+Tabs.Misc:AddToggle("HideIdenity", {
+   Title = "Hide Idenity",
+   Default = States.HideIdenity,
+   Callback = function(Value)
+        _G.HideIdentity = Value 
+
+        while _G.HideIdentity do
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoidrp = character and character:FindFirstChild("HumanoidRootPart")
+            local usr = humanoidrp and humanoidrp:FindFirstChild("user")
+            local hud = player:FindFirstChildOfClass("PlayerGui") and player.PlayerGui:FindFirstChild("hud")
+            local sfzone = hud and hud:FindFirstChild("safezone") -- Fixed typo
+
+            if sfzone then
+                local lvl = sfzone:FindFirstChild("lvl")
+                local coins = sfzone:FindFirstChild("coins")
+
+                if lvl then 
+                    lvl.Text = "Cookie Hub" 
+                end
+                if coins then 
+                    coins.Text = "Cookie Hub" 
+                end
+            end
+            
+            if usr then
+                local level = usr:FindFirstChild("level")
+                local streak = usr:FindFirstChild("streak")
+                local title = usr:FindFirstChild("title")
+                local usertitle = usr:FindFirstChild("user")
+
+                if level and level:IsA("TextLabel") then 
+                    level.Text = "Cookie Hub" -- Fixed incorrect property
+                end
+                if streak and streak:IsA("TextLabel") then 
+                    streak.Text = "Cookie Hub" -- Fixed incorrect property
+                end
+                if title and title:IsA("TextLabel") then 
+                    title.Text = "Cookie Hub" -- Fixed incorrect property
+                end
+                if usertitle and usertitle:IsA("TextLabel") then 
+                    usertitle.Text = "Cookie Hub" -- Fixed incorrect property
+                end
+            end
+
+            task.wait(1) -- i love you guys :D
         end
     end
 })
