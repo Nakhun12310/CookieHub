@@ -1,6 +1,7 @@
---[[ https://discord.gg/fWBngW2r5H ]]
+-- Load the latest version of Fluent UI Library
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
---optimization and variables
+-- Optimization and variable declarations
 local game = game
 local players = game:GetService("Players")
 local player = players.LocalPlayer
@@ -20,34 +21,40 @@ local silentkeybindtoggle = false
 local silentkeybind = false
 local noforcefields = false
 local weapons = {}
-for _,v in pairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
-    table.insert(weapons,v.Name)
-end
 local camos = {}
-for _,v in pairs(game:GetService("ReplicatedStorage").Camos:GetChildren()) do
-    table.insert(camos,v.Name)
+
+-- Populate weapons and camos from ReplicatedStorage
+for _, v in pairs(game:GetService("ReplicatedStorage").Weapons:GetChildren()) do
+    table.insert(weapons, v.Name)
 end
+
+for _, v in pairs(game:GetService("ReplicatedStorage").Camos:GetChildren()) do
+    table.insert(camos, v.Name)
+end
+
 local primary
 local secondary
 local primarycamo
 local secondarycamo
----
 
---- functions
-local s=player.PlayerScripts.Vortex.Modifiers.Steadiness
-local m=player.PlayerScripts.Vortex.Modifiers.Mobility
-local function r()
-if s and s.Value>0 then s.Value=0 end
-if m and m.Value>0 then m.Value=0 end
+-- Functions to handle modifiers
+local s = player.PlayerScripts.Vortex.Modifiers.Steadiness
+local m = player.PlayerScripts.Vortex.Modifiers.Mobility
+
+local function resetModifiers()
+    if s and s.Value > 0 then s.Value = 0 end
+    if m and m.Value > 0 then m.Value = 0 end
 end
-if s then s.Changed:Connect(r) end
-if m then m.Changed:Connect(r) end
-r()
 
-local function visible(origin, direction, target, ignore)
+if s then s.Changed:Connect(resetModifiers) end
+if m then m.Changed:Connect(resetModifiers) end
+resetModifiers()
+
+-- Function to check visibility
+local function isVisible(origin, direction, target, ignore)
     local params = RaycastParams.new()
+    local filterList = {player.Character, target}
 
-    local filterList = {game.Players.LocalPlayer.Character, target}
     if ignore then
         for _, v in ipairs(ignore) do
             table.insert(filterList, v)
@@ -55,31 +62,28 @@ local function visible(origin, direction, target, ignore)
     end
 
     params.FilterDescendantsInstances = filterList
-    return (not workspace:Raycast(origin, direction, params))
+    return not workspace:Raycast(origin, direction, params)
 end
 
-local closestPlayer = nil
-local team = nil
-
+-- Function to get the closest player
 local function getClosestPlayer()
-    team = player:GetAttribute("Team")
+    local team = player:GetAttribute("Team")
     local closest, distance = nil, math.huge
 
     for _, character in ipairs(workspace:GetChildren()) do
         local humanoid = character:FindFirstChild("Humanoid")
         if character and humanoid and humanoid.Health > 0 then
-            local player = players:FindFirstChild(character.Name)
-            if player and player:GetAttribute("Team") ~= team then
+            local targetPlayer = players:FindFirstChild(character.Name)
+            if targetPlayer and targetPlayer:GetAttribute("Team") ~= team then
                 local head = character:FindFirstChild("Head")
                 if head then
-                    local w2s, onscreen = camera:WorldToViewportPoint(head.Position)
-                    if onscreen then
-                        local dist = (vector2(w2s.X, w2s.Y) - vector2(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)).Magnitude
+                    local screenPosition, onScreen = camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local dist = (vector2(screenPosition.X, screenPosition.Y) - vector2(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)).Magnitude
                         if dist < distance then
-                            -- Check if the player is visible before targeting them
                             local origin = camera.CFrame.Position
                             local direction = head.Position - origin
-                            if visible(origin, direction, character, nil) then
+                            if isVisible(origin, direction, character, nil) then
                                 closest = character
                                 distance = dist
                             end
@@ -92,10 +96,12 @@ local function getClosestPlayer()
     return closest
 end
 
+-- Update closest player each frame
 rs.RenderStepped:Connect(function()
     closestPlayer = getClosestPlayer()
 end)
 
+-- Hook to modify aiming behavior
 local oldIndex
 oldIndex = hookmetamethod(game, "__index", function(self, index)
     local func = debug.getinfo(3, "n")
@@ -103,10 +109,9 @@ oldIndex = hookmetamethod(game, "__index", function(self, index)
         if func.name == "Fire" and index == "CFrame" and closestPlayer then
             local head = closestPlayer:FindFirstChild("Head")
             if head then
-                -- Check visibility
                 local origin = camera.CFrame.Position
                 local direction = head.Position - origin
-                if visible(origin, direction, closestPlayer, nil) and silentaim then
+                if isVisible(origin, direction, closestPlayer, nil) and silentaim then
                     if silentkeybindtoggle then
                         if silentkeybind then
                             return cframe(head.Position)
@@ -121,8 +126,9 @@ oldIndex = hookmetamethod(game, "__index", function(self, index)
     return oldIndex(self, index)
 end)
 
+-- Remove enemy forcefields if enabled
 rs.RenderStepped:Connect(function()
-    for _,v in pairs(game:GetService("Workspace").Env:GetChildren()) do
+    for _, v in pairs(workspace.Env:GetChildren()) do
         if string.find(v.Name, "Forcefield") and noforcefields then
             if v.FullSphere.Color ~= Color3.fromRGB(0, 102, 255) then
                 v:Destroy()
@@ -130,179 +136,79 @@ rs.RenderStepped:Connect(function()
         end
     end
 end)
----
 
---- ui
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-
-OrionLib:MakeNotification({
-	Name = "GunFight Arena",
-	Content = "",
-	Image = "rbxassetid://4483345998",
-	Time = 5
+-- Initialize Fluent UI Window
+local Window = Fluent:CreateWindow({
+    Title = "Gunfight Arena",
+    SubTitle = "Silent Aim & Weapon Changer",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark"
 })
 
-local Window = OrionLib:MakeWindow({Name = "Gunfight arena", HidePremium = false, SaveConfig = false, ConfigFolder = "gunfight arena"})
+-- Create Tabs
+local aimTab = Window:AddTab({ Title = "Aim", Icon = "rbxassetid://4483345998" })
+local weaponTab = Window:AddTab({ Title = "Weapons", Icon = "rbxassetid://4483345998" })
+local settingsTab = Window:AddTab({ Title = "Settings", Icon = "rbxassetid://4483345998" })
 
-
-local aimtab = Window:MakeTab({
-	Name = "Aim",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-local weapontab = Window:MakeTab({
-	Name = "weapons",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-local aimsection = aimtab:AddSection({
-	Name = "SilentAim"
+-- Aim Tab Elements
+aimTab:AddToggle("Silent Aim", {
+    Default = false,
+    Callback = function(value)
+        silentaim = value
+    end
 })
 
-
-aimsection:AddToggle({
-	Name = "Silent Aim",
-	Default = false,
-	Callback = function(Value)
-		silentaim = Value
-	end    
+aimTab:AddToggle("SilentAim Keybind Toggle", {
+    Default = false,
+    Callback = function(value)
+        silentkeybindtoggle = value
+    end
 })
 
-aimsection:AddToggle({
-	Name = "SilentAim keybind toggle",
-	Default = false,
-	Callback = function(Value)
-		silentkeybindtoggle = Value
-	end    
-})
-
-aimsection:AddBind({
-	Name = "silent aim keybind",
-	Default = enum.E,
-	Hold = false,
-	Callback = function()
+aimTab:AddKeybind("Silent Aim Keybind", {
+    Default = enum.E,
+    Callback = function()
         if silentkeybindtoggle then
-            if silentkeybind then
-                silentkeybind = false
-            else
-                silentkeybind = true
-            end
+            silentkeybind = not silentkeybind
         end
-	end    
+    end
 })
 
-local miscsection = aimtab:AddSection({
-	Name = "Misc"
+aimTab:AddToggle("No Enemy Forcefields", {
+    Default = false,
+    Callback = function(value)
+        noforcefields = value
+    end
 })
 
-miscsection:AddToggle({
-	Name = "no enemy forcefields",
-	Default = false,
-	Callback = function(Value)
-		noforcefields = Value
-	end    
+-- Weapon Tab Elements
+weaponTab:AddDropdown("Primary Weapon", {
+    Options = weapons,
+    Default = weapons[1],
+    Callback = function(value)
+        primary = value
+    end
 })
 
-local primarySection = weapontab:AddSection({
-	Name = "primary weapon changer"
+weaponTab:AddButton("Equip Primary", function()
+    player:SetAttribute("Primary", primary)
+end)
+
+weaponTab:AddDropdown("Primary Camo", {
+    Options = camos,
+    Default = camos[1],
+    Callback = function(value)
+        primarycamo = value
+    end
 })
 
-local primaryDropdown = primarySection:AddDropdown({
-	Name = "gun selector",
-	Default = weapons[1],
-	Options = weapons,
-	Callback = function(Value)
-	  	primary = Value
-	end,
-})
+weaponTab:AddButton("Equip Primary Camo", function()
+    player:SetAttribute("PrimaryCamo", primarycamo)
+end)
 
-local primarybutton = primarySection:AddButton({
-	Name = "equip gun",
-	Callback = function()
-		player:SetAttribute("Primary",primary)
-	end,
-})
+weaponTab:AddDropdown("Secondary Weapon", {
 
-local primarySection2 = weapontab:AddSection({
-	Name = "primary weapon camo changer"
-})
-
-local primaryDropdown2 = primarySection2:AddDropdown({
-	Name = "camo selector",
-	Default = camos[1],
-	Options = camos,
-	Callback = function(Value)
-	  	primarycamo = Value
-	end,
-})
-
-local primarybutton2 = primarySection2:AddButton({
-	Name = "equip camo",
-	Callback = function()
-		player:SetAttribute("PrimaryCamo",primarycamo)
-	end,
-})
-
-local secondarySection = weapontab:AddSection({
-	Name = "Secondary weapon changer"
-})
-
-local secondarydropdown = secondarySection:AddDropdown({
-	Name = "gun selector",
-	Default = weapons[1],
-	Options = weapons,
-	Callback = function(Value)
-	  	secondary = Value
-	end,
-})
-
-local secondarybutton = secondarySection:AddButton({
-	Name = "equip gun",
-	Callback = function()
-		player:SetAttribute("Secondary",secondary)
-	end,
-})
-
-local secondarySection2 = weapontab:AddSection({
-	Name = "Secondary weapon camo changer"
-})
-
-local secondarydropdown2 = secondarySection2:AddDropdown({
-	Name = "camo selector",
-	Default = camos[1],
-	Options = camos,
-	Callback = function(Value)
-	  	secondarycamo = Value
-	end,
-})
-
-local secondarybutton2 = secondarySection2:AddButton({
-	Name = "equip camo",
-	Callback = function()
-		player:SetAttribute("SecondaryCamo",secondarycamo)
-	end,
-})
-
-
-
-local SettingsTab = Window:MakeTab({
-	Name = "Settings",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-local SettingsSection = SettingsTab:AddSection({
-	Name = "Settings"
-})
-
-SettingsSection:AddButton({
-	Name = "Destroy UI",
-	Callback = function()
-        OrionLib:Destroy()
-  	end    
-})
-
-
-OrionLib:Init()
----
+::contentReference[oaicite:0]{index=0}
+ 
