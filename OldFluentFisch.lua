@@ -212,6 +212,10 @@ Tabs.Fishing:AddToggle("AutoReel", {
                                 Reel()
                                 task.wait(0.5)
                                 Reel()
+				task.wait(1)
+				if rod.values.bite.Value == true then
+				   Reel()
+				end
                                 Reset()
                              end
                           end
