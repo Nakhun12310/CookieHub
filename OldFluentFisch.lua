@@ -233,7 +233,7 @@ Tabs.Fishing:AddToggle("InstantReel", {
     Default = States.InstantReel,
     Callback = function(Value)
         States.InstantReel = Value
-        while States.AutoReel do
+        while States.InstantReel do
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
