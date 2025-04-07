@@ -535,8 +535,8 @@ Tabs.Misc:AddToggle("HideIdenity", {
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
-InterfaceManager:BuildInterfaceSection(Tabs.Misc)
-SaveManager:BuildConfigSection(Tabs.Misc)
+InterfaceManager:BuildInterfaceSection(Tabs.Fishing)
+SaveManager:BuildConfigSection(Tabs.Fishing)
 
 Window:SelectTab(1)
 
