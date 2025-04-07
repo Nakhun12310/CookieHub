@@ -272,7 +272,7 @@ Tabs.Main:AddToggle("InstantReel", {
     end            
 }) 
 
-Tabs.Auto:AddToggle("AutoSell", 
+--[[Tabs.Auto:AddToggle("AutoSell", 
 {
     Title = "Auto Sell All", 
     Description = "Sell all your fishes",
@@ -289,7 +289,7 @@ Tabs.Auto:AddToggle("AutoSell",
     end 
 })
 
---[[ Tabs.Auto:AddToggle("AutoSell", {
+Tabs.Auto:AddToggle("AutoSell", {
     Title = "Auto Sell Items",
     Default = States.AutoSell,
     Callback = function(Value)
@@ -302,7 +302,7 @@ Tabs.Auto:AddToggle("AutoSell",
     end
 }) ]]
 
--- Player Tab
+--[[ Player Tab
 local walkSpeed = 16
 local jumpPower = 50
 
@@ -342,7 +342,7 @@ Tabs.Player:AddInput("JumpPower", {
 	   end
 	end
     end
-})
+}) ]]
 
 -- Misc Tab
 
@@ -374,7 +374,7 @@ Tabs.Misc:AddToggle("Noclip",
            end
 	end
     end 
-})
+}) 
 
 --[[Tabs.Misc:AddToggle("NoClip", {
     Title = "NoClip",
