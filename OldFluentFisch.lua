@@ -186,7 +186,7 @@ Tabs.Fishing:AddToggle("AutoShake", {
         while States.AutoShake do
             Shake()
             Shake()
-            task.wait(0.1)
+            task.wait(0.01)
         end
     end
 })
