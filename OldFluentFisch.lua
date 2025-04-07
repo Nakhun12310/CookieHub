@@ -10,7 +10,7 @@ local Window = Fluent:CreateWindow({
     Title = "Fluent " .. Fluent.Version,
     SubTitle = "by dawid",
     TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
+    Size = UDim2.fromOffset(580, 420),
     Acrylic = true,
     Theme = "Dark",
     -- Removed MinimizeKey argument (not valid in Fluent)
@@ -535,8 +535,8 @@ Tabs.Misc:AddToggle("HideIdenity", {
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
-InterfaceManager:BuildInterfaceSection(Tabs.Fishing)
-SaveManager:BuildConfigSection(Tabs.Fishing)
+InterfaceManager:BuildInterfaceSection(Tabs.Misc)
+SaveManager:BuildConfigSection(Tabs.Misc)
 
 Window:SelectTab(1)
 
