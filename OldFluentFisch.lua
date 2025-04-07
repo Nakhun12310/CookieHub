@@ -208,9 +208,8 @@ Tabs.Fishing:AddToggle("AutoReel", {
                                 bar.Visible = true   
 				task.wait(1.5)
                                 Reel()
-                                task.wait(1)
-                                Reel()
                                 task.wait(0.5)
+                                Reel()
                                 Reset()
                              end
                           end
