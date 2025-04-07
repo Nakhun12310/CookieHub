@@ -228,7 +228,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
-Tabs.Fishing:AddToggle("InstantReel", {
+--[[Tabs.Fishing:AddToggle("InstantReel", {
     Title = "Instant Reel",
     Default = States.InstantReel,
     Callback = function(Value)
@@ -263,7 +263,7 @@ Tabs.Fishing:AddToggle("InstantReel", {
             task.wait(0.1)
         end
     end
-})
+}) ]]
 
 Tabs.Auto:AddToggle("AutoSell", 
 {
