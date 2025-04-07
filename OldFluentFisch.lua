@@ -13,7 +13,8 @@ local Window = Fluent:CreateWindow({
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
     Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
+    -- Removed MinimizeKey argument (not valid in Fluent)
+})
 
 -- Services
 local Players = game:GetService("Players")
@@ -224,53 +225,31 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
+-- Fixed Duplicate InstantReel Toggle (only one should be kept)
 Tabs.Main:AddToggle("InstantReel", 
 {
     Title = "Instant Reel", 
     Description = "Instant Reel",
     Default = States.InstantReel,
     Callback = function(state)
-	States.InstantReel = state
-	while States.InstantReel do
-	   task.wait(0.1)
-	   local Rod = getRod()
-	   if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
-		if Rod.values.bite.Value == true then
-		   task.wait(1)
-		   Reel()
-		   task.wait(1)
-		   if Rod.values.bite.Value == true then
-		      Reel()
-		   end
-		end
-	    end
-	end
-    end 
-})
-
-Tabs.Main:AddToggle("InstantReel", {
-    Title = "Instant Reel",
-    Default = States.InstantReel,
-    Default = function(Value)
-        States.InstantReel = Value
+        States.InstantReel = state
         while States.InstantReel do
-            task.wait(1) -- Prevent excessive calls
-
-                local Rod = getRod()
-                if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
+            task.wait(0.1)
+            local Rod = getRod()
+            if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
                 if Rod.values.bite.Value == true then
-			    task.wait(0.75)
-			    Reel()
-			    task.wait(0.5)
-			    Reel()
-			    task.wait(0.5)
-			    Reset()
-               repeat task.wait(0.1) until Rod.values.bite.Value == false
+                    task.wait(1)
+                    Reel()
+                    task.wait(1)
+                    if Rod.values.bite.Value == true then
+                        Reel()
+                    end
+                end
             end
-         end
-       end         
-    end            
+        end
+    end
 }) 
+
 
 --[[Tabs.Auto:AddToggle("AutoSell", 
 {
@@ -344,7 +323,7 @@ Tabs.Player:AddInput("JumpPower", {
     end
 }) ]]
 
--- Misc Tab
+--[[ Misc Tab
 
 Tabs.Misc:AddToggle("Noclip", 
 {
@@ -374,7 +353,7 @@ Tabs.Misc:AddToggle("Noclip",
            end
 	end
     end 
-}) 
+}) ]]
 
 --[[Tabs.Misc:AddToggle("NoClip", {
     Title = "NoClip",
