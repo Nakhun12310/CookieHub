@@ -206,8 +206,8 @@ Tabs.Fishing:AddToggle("AutoReel", {
                             if bar and ReplicatedStorage:FindFirstChild("events") then
                                 local playerbar = bar:FindFirstChild("playerbar")
                                 if playerbar then
-                                playerbar.Size = UDim2.new(1, 0, 1, 0)
-                                -- bar.Visible = true   
+				if bar.Visible then						
+                                playerbar.Size = UDim2.new(1, 0, 1, 0) 
 				task.wait(1.5)
                                 Reel()
                                 task.wait(0.5)
@@ -217,6 +217,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
 				   Reel()
 				end
                                 Reset()
+				end					
                              end
                           end
                        end
