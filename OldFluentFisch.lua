@@ -16,6 +16,22 @@ local Window = Fluent:CreateWindow({
     -- Removed MinimizeKey argument (not valid in Fluent)
 })
 
+--[[local Button = Instance.new("TextButton")
+Button.Parent = game.CoreGui
+Button.Size = UDim2.new(0, 120, 0, 30)
+Button.Position = UDim2.new(0.5, -60, 0, 100)
+Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Button.Text = "Open UI"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Active = true
+Button.Draggable = true 
+
+Fluent:ToggleTransparency(false) and Fluent:ToggleTransparency(true)
+
+Button.MouseButton1Click:Connect(function()
+   
+end ]]
+
 -- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
