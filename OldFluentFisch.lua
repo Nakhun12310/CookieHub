@@ -265,7 +265,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 }) ]]
 
-Tabs.Auto:AddToggle("AutoSell", 
+--[[Tabs.Auto:AddToggle("AutoSell", 
 {
     Title = "Auto Sell All", 
     Description = "Sell all your fishes",
@@ -280,7 +280,7 @@ Tabs.Auto:AddToggle("AutoSell",
 	   end
 	end
     end 
-})
+})]]
 
 --[[ Player Tab
 local walkSpeed = 16
