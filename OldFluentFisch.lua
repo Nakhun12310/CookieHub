@@ -409,7 +409,7 @@ Tabs.Misc:AddToggle("Noclip",
     end
 }) ]]
 
-local Player = game.Players.LocalPlayer
+--[[ local Player = game.Players.LocalPlayer
 local Character = Player and Player.Character
 local Resources = Character and Character:FindFirstChild("Resources")
 local gas = Resources and Resources:FindFirstChild("gas")
@@ -434,7 +434,7 @@ Tab.Misc:AddToggle("DisableResources",
     end 
 })
 	
---[[Tabs.Misc:AddToggle("DisableResources", {
+Tabs.Misc:AddToggle("DisableResources", { -- old
    Title = "Disable Resources",
    Default = States.DisableResources,
    Callback = function(Value)
@@ -448,7 +448,7 @@ Tab.Misc:AddToggle("DisableResources",
    end
 }) ]]
 
-Tabs.Misc:AddToggle("HideIdenity", 
+--[[Tabs.Misc:AddToggle("HideIdenity", 
 {
     Title = "Hide Idenity", 
     Default = States.HideIdenity,
@@ -496,9 +496,9 @@ Tabs.Misc:AddToggle("HideIdenity",
 
             task.wait(1) -- i love you guys :D
     end 
-})
+}) 
 	
---[[ Tabs.Misc:AddToggle("HideIdenity", {
+Tabs.Misc:AddToggle("HideIdenity", {
    Title = "Hide Idenity",
    Default = States.HideIdenity,
    Callback = function(Value)
