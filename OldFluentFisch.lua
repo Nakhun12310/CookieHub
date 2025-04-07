@@ -16,31 +16,6 @@ local Window = Fluent:CreateWindow({
     -- Removed MinimizeKey argument (not valid in Fluent)
 })
 
-Window:Hide()
-
-local Button = Instance.new("TextButton")
-Button.Parent = game.CoreGui
-Button.Size = UDim2.new(0, 120, 0, 30)
-Button.Position = UDim2.new(0.5, -60, 0, 100)
-Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Button.Text = "Open UI"
-Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-Button.Active = true
-Button.Draggable = true -- This makes it draggable easily
-
-local open = false
-
-Button.MouseButton1Click:Connect(function()
-	open = not open
-	if open then
-		Window:Show()
-		Button.Text = "Close UI"
-	else
-		Window:Hide()
-		Button.Text = "Open UI"
-	end
-end)
-
 -- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
