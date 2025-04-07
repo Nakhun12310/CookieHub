@@ -26,10 +26,10 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
 -- Tabs
 local Tabs = {
-    Fishing = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" }),
-    Auto = Window:AddTab({ Title = "Auto", Icon = "layers" }),
-    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
-    Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
+    Fishing = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" })
+    --Auto = Window:AddTab({ Title = "Auto", Icon = "layers" }),
+    --Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    --Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
 }
 
 -- States
