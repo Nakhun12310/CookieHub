@@ -2,21 +2,18 @@
 -- by Zepthical
 
 -- Load Fluent UI
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/ForgeNet-UI/Fluent/main/library.lua"))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
-
 local Window = Fluent:CreateWindow({
-    Title = "CookieHub | Fisch",
-    SubTitle = "Auto Fisch Script",
+    Title = "Fluent " .. Fluent.Version,
+    SubTitle = "by dawid",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
     Theme = "Dark",
-    Center = true,
-    Transparent = false,
-})
-
+    MinimizeKey = Enum.KeyCode.LeftControl
 
 -- Services
 local Players = game:GetService("Players")
