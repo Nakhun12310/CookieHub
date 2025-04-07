@@ -27,7 +27,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 -- Tabs
 local Tabs = {
     Fishing = Window:AddTab({ Title = "Fishing", Icon = "fishing-pole" })
-    --Auto = Window:AddTab({ Title = "Auto", Icon = "layers" }),
+    Auto = Window:AddTab({ Title = "Auto", Icon = "layers" }),
     --Player = Window:AddTab({ Title = "Player", Icon = "user" }),
     --Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
 }
@@ -228,33 +228,44 @@ Tabs.Fishing:AddToggle("AutoReel", {
     end
 })
 
--- Fixed Duplicate InstantReel Toggle (only one should be kept)
-Tabs.Main:AddToggle("InstantReel", 
-{
-    Title = "Instant Reel", 
-    Description = "Instant Reel",
+Tabs.Fishing:AddToggle("InstantReel", {
+    Title = "Instant Reel",
     Default = States.InstantReel,
-    Callback = function(state)
-        States.InstantReel = state
-        while States.InstantReel do
-            task.wait(0.1)
-            local Rod = getRod()
-            if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
-                if Rod.values.bite.Value == true then
-                    task.wait(1)
-                    Reel()
-                    task.wait(1)
-                    if Rod.values.bite.Value == true then
-                        Reel()
-                    end
+    Callback = function(Value)
+        States.InstantReel = Value
+        while States.AutoReel do
+            local rod = getRod()
+            if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
+                if rod.values.bite.Value then
+                    for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+                         if v:IsA("ScreenGui") and v.Name == "reel" then
+                            local bar = v:FindFirstChild("bar")
+                            if bar and ReplicatedStorage:FindFirstChild("events") then
+                                local playerbar = bar:FindFirstChild("playerbar")
+                                if playerbar then				
+                                playerbar.Size = UDim2.new(1, 0, 1, 0) 
+				task.wait(1)
+                                Reel()
+                                task.wait(0.5)
+                                Reel()
+				task.wait(1)
+				if rod.values.bite.Value == true then
+				   Reel()
+				end
+                                Reset()	
+                             end
+                          end
+                       end
+                    end                    
+                    repeat task.wait(0.1) until not rod.values.bite.Value
                 end
             end
+            task.wait(0.1)
         end
     end
-}) 
+})
 
-
---[[Tabs.Auto:AddToggle("AutoSell", 
+Tabs.Auto:AddToggle("AutoSell", 
 {
     Title = "Auto Sell All", 
     Description = "Sell all your fishes",
@@ -270,19 +281,6 @@ Tabs.Main:AddToggle("InstantReel",
 	end
     end 
 })
-
-Tabs.Auto:AddToggle("AutoSell", {
-    Title = "Auto Sell Items",
-    Default = States.AutoSell,
-    Callback = function(Value)
-        States.AutoSell = Value
-        while States.AutoSell do
-            local SellAll = ReplicatedStorage.events:FindFirstChild("SellAll")
-            if SellAll then SellAll:InvokeServer() end
-            task.wait(1.5)
-        end
-    end
-}) ]]
 
 --[[ Player Tab
 local walkSpeed = 16
