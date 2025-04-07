@@ -16,7 +16,7 @@ local Window = Fluent:CreateWindow({
     -- Removed MinimizeKey argument (not valid in Fluent)
 })
 
-Window:Show()
+Window:Hide()
 
 local Button = Instance.new("TextButton")
 Button.Parent = game.CoreGui
@@ -28,7 +28,7 @@ Button.TextColor3 = Color3.fromRGB(255, 255, 255)
 Button.Active = true
 Button.Draggable = true -- This makes it draggable easily
 
-local open = true
+local open = false
 
 Button.MouseButton1Click:Connect(function()
 	open = not open
