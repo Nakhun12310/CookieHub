@@ -563,7 +563,7 @@ SaveManager:IgnoreThemeSettings()
 InterfaceManager:BuildInterfaceSection(Tabs.Misc)
 SaveManager:BuildConfigSection(Tabs.Misc)
 
-Window:SelectTab(Main)
+Window:SelectTab(1)
 
 Fluent:Notify({
     Title = "🍪 Cookie Hub",
