@@ -23,6 +23,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
 -- Tabs
 local Tabs = {
@@ -173,7 +174,7 @@ Tabs.Fishing:AddToggle("AutoCast", {
             if rod and rod:FindFirstChild("values") and not rod.values.casted.Value then
                 Cast()
             end
-            task.wait(1)
+            task.wait(0.45)
         end
     end
 })
@@ -317,7 +318,7 @@ Tabs.Player:AddInput("WalkSpeed", {
     Callback = function(Value)
 	States.Speed = Value
 	while States.Speed do
-           local char = game.Players.LocalPlayer.Character
+           local char = getCharacter()
 	   if char and char:FindFirstChild("Humanoid") then
 	      char.Humanoid.WalkSpeed = Value
 	      task.wait(1)
@@ -336,7 +337,7 @@ Tabs.Player:AddInput("JumpPower", {
     Callback = function(Value)
 	States.Jump = Value
 	while States.Jump do
-           local char = game.Players.LocalPlayer.Character
+           local char = getCharacter()
 	   if char and char:FindFirstChild("Humanoid") then
 	      char.Humanoid.JumpPower = Value
 	      task.wait(1)
@@ -357,7 +358,7 @@ Tabs.Misc:AddToggle("Noclip",
 	if Value then
 	   local function nocliploop()
 		while States.NoClip do
-		local char = game.Players.LocalPlayer.Character
+		local char = getCharacter()
 		for _, v in pairs(char:GetDescendants()) do
 		 if v:ISA("BasePart") then
 		    v.CanCollide = false
@@ -367,7 +368,7 @@ Tabs.Misc:AddToggle("Noclip",
 	   end
 	   coroutine.wrap(noclipLoop)()
 	   else
-	   	local char = game.Players.LocalPlayer.Character	
+	   	local char = getCharacter()
 	   	for _, v in pairs(char:GetDescendants()) do
               	if v:IsA("BasePart") then
                  v.CanCollide = true
