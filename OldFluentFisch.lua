@@ -1,6 +1,6 @@
 -- 🍪 Cookie Hub (Fluent UI) - Complete Script
 -- by Zepthical
-pcall(function()
+
 -- Load Fluent UI
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
@@ -57,13 +57,12 @@ local function getCharacter()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
 
-
-local Rod = Char:FindFirstChildOfClass("Tool")
+local Rod = Char:FindFirstChildOfClass("Tool") -- ค้นหา Rod ที่เป็น Tool
 
 local function Cast()
-    if Rod and rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
-    	task.wait(.1)
-    	Rod.events.cast:FireServer(100,1)
+    if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
+        task.wait(0.1) -- รอเวลาสักครู่
+        Rod.events.cast:FireServer(100, 1) -- เรียกใช้ FireServer สำหรับการ Cast
     end
 end
 
@@ -79,13 +78,21 @@ local function Shake()
 
     local button = safezone:FindFirstChild("button")
     if button and button:IsA("ImageButton") and button.Visible then
-        pcall(function() -- ใช้ pcall เพื่อกัน error
+        -- ใช้ pcall เพื่อป้องกันข้อผิดพลาดที่อาจเกิดขึ้น
+        local success, errorMessage = pcall(function() 
             GuiService.SelectedObject = button
+            -- ส่ง key event ให้กับ button
             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
         end)
+
+        -- ตรวจสอบหากเกิดข้อผิดพลาด
+        if not success then
+            warn("Error occurred during Shake: " .. errorMessage)
+        end
     end
 end
+
 
 local function Reel()
     -- ลองลดเวลา wait() ให้เร็วที่สุด
@@ -262,4 +269,3 @@ Fluent:Notify({
 })
 
 
-end)
