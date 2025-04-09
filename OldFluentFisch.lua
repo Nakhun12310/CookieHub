@@ -58,14 +58,14 @@ local function getCharacter()
 end
 
 local function getRod()
-    local char = getCharacter()
-    return char and char:FindFirstChildOfClass("Tool")
+    local Rod = Char:FindFirstChildOfClass("Tool")
 end
 
 local function Cast()
     local rod = getRod()
     if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("cast") then
-        rod.events.cast:FireServer(100, 1)
+    	task.wait(.1)
+    	Rod.events.cast:FireServer(100,1)
     end
 end
 
@@ -188,6 +188,8 @@ Tabs.Fishing:AddToggle("AutoEquip", {
     end
 })
 
+
+
 Tabs.Fishing:AddToggle("AutoCast", {
     Title = "Auto Cast",
     Default = States.AutoCast,
@@ -195,29 +197,13 @@ Tabs.Fishing:AddToggle("AutoCast", {
         States.AutoCast = Value
         while States.AutoCast do
             local rod = getRod()
-            if not rod or not rod.Parent then
-                print("No rod or rod parent is missing") -- ตรวจสอบว่าได้ rod จริงหรือไม่
-                break
-            end
-
-            if rod:FindFirstChild("values") and rod.values:FindFirstChild("casted") then
-                if not rod.values.casted.Value then
-                    pcall(function()
-                        local success, errorMessage = pcall(function() 
-                            Cast()
-                        end)
-                        if not success then
-                            print("Error in casting: " .. errorMessage) -- ตรวจสอบ error ในการ cast
-                        end
-                    end)
-                else
-                    print("Rod already casted") -- แจ้งว่า rod ถูก casted แล้ว
-                end
-            else
-                print("No values or casted found in rod") -- แจ้งว่าไม่มีค่า casted ใน rod
-            end
-
-            task.wait(0.45)
+             if rod and rod:FindFirstChild("values") then
+	      local casted = rod.values:FindFirstChild("casted")
+	      if casted.Value == false then
+		  pcall(function()
+		  Cast()
+	      end)
+	   end
         end
     end
 })
