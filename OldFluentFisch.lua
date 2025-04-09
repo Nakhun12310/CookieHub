@@ -69,50 +69,72 @@ end
 
 local function Shake()
     local PlayerGUI = LocalPlayer:FindFirstChild("PlayerGui")
-    local shakeUI = PlayerGUI and PlayerGUI:FindFirstChild("shakeui")
-    if shakeUI and shakeUI.Enabled then
-        local safezone = shakeUI:FindFirstChild("safezone")
-        if safezone then
-            local button = safezone:FindFirstChild("button")
-            if button and button:IsA("ImageButton") and button.Visible then
-                GuiService.SelectedObject = button
-                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-            end
-        end
+    if not PlayerGUI then return end -- ถ้าไม่เจอ PlayerGui ก็หยุดทำงาน
+
+    local shakeUI = PlayerGUI:FindFirstChild("shakeui")
+    if not shakeUI or not shakeUI.Enabled then return end -- ถ้าไม่เจอ shakeUI หรือมันปิด ก็หยุดทำงาน
+
+    local safezone = shakeUI:FindFirstChild("safezone")
+    if not safezone then return end -- ถ้าไม่เจอ safezone ก็หยุดทำงาน
+
+    local button = safezone:FindFirstChild("button")
+    if button and button:IsA("ImageButton") and button.Visible then
+        pcall(function() -- ใช้ pcall เพื่อกัน error
+            GuiService.SelectedObject = button
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+        end)
     end
 end
 
 local function Reel()
     task.wait(0.2)
+    local reelUI = nil
+    
     for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
         if v:IsA("ScreenGui") and v.Name == "reel" then
-            local bar = v:FindFirstChild("bar")
-            if bar and ReplicatedStorage:FindFirstChild("events") then
-                local playerbar = bar:FindFirstChild("playerbar")
-                if playerbar then
-                    playerbar.Size = UDim2.new(1, 0, 1, 0)
-                    bar.Visible = false
-                    local reelFinished = ReplicatedStorage.events:FindFirstChild("reelfinished")
-                    if reelFinished then
-                        reelFinished:FireServer(100, true)
-                    end
-                end
-            end
+            reelUI = v
+            break
         end
     end
+
+    if not reelUI then return end 
+
+    local bar = reelUI:FindFirstChild("bar")
+    if not bar then return end 
+
+    local playerbar = bar:FindFirstChild("playerbar")
+    if not playerbar then return end 
+
+    local events = ReplicatedStorage:FindFirstChild("events")
+    if not events then return end 
+
+    local reelFinished = events:FindFirstChild("reelfinished")
+    if not reelFinished then return end 
+
+    
+    playerbar.Size = UDim2.new(1, 0, 1, 0)
+    bar.Visible = false
+
+    pcall(function()
+        reelFinished:FireServer(100, true)
+    end)
 end
+
 
 local function Reset()
     local rod = getRod()
     if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
         task.wait(0.1)
         rod.events.reset:FireServer()
+
         local equipRemote = ReplicatedStorage.packages.Net:FindFirstChild("RE/Backpack/Equip")
         if equipRemote then
-            equipRemote:FireServer(rod)
-            task.wait(0.1)
-            equipRemote:FireServer(rod)
+            pcall(function()
+                equipRemote:FireServer(rod)
+                task.wait(0.1)
+                equipRemote:FireServer(rod)
+            end)
         end
     end
 end
@@ -170,13 +192,25 @@ Tabs.Fishing:AddToggle("AutoCast", {
         States.AutoCast = Value
         while States.AutoCast do
             local rod = getRod()
-            if rod and rod:FindFirstChild("values") and not rod.values.casted.Value then
-                Cast()
+
+            
+            if not rod or not rod.Parent then
+                break
             end
+
+            
+            if rod:FindFirstChild("values") and not rod.values.casted.Value then
+                pcall(function()
+                    Cast() 
+                end)
+            end
+
+            
             task.wait(0.45)
         end
     end
 })
+
 
 Tabs.Fishing:AddToggle("AutoShake", {
     Title = "Auto Shake",
@@ -185,8 +219,8 @@ Tabs.Fishing:AddToggle("AutoShake", {
         States.AutoShake = Value
         while States.AutoShake do
             Shake()
-            Shake()
-            task.wait(0.01)
+	    Shake()
+            task.wait(0.1) 
         end
     end
 })
@@ -201,25 +235,26 @@ Tabs.Fishing:AddToggle("AutoReel", {
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
                 if rod.values.bite.Value then
                     for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-                         if v:IsA("ScreenGui") and v.Name == "reel" then
+                        if v:IsA("ScreenGui") and v.Name == "reel" then
                             local bar = v:FindFirstChild("bar")
                             if bar and ReplicatedStorage:FindFirstChild("events") then
                                 local playerbar = bar:FindFirstChild("playerbar")
-                                if playerbar then				
-                                playerbar.Size = UDim2.new(1, 0, 1, 0) 
-				task.wait(1.5)
-                                Reel()
-                                task.wait(0.5)
-                                Reel()
-				task.wait(1)
-				if rod.values.bite.Value == true then
-				   Reel()
-				end
-                                Reset()	
-                             end
-                          end
-                       end
-                    end                    
+                                if playerbar then
+                                    playerbar.Size = UDim2.new(1, 0, 1, 0)
+                                    task.wait(1.5)
+                                    Reel()
+                                    task.wait(0.5)
+                                    Reel()
+                                    task.wait(1)
+                                    if rod.values.bite.Value then
+                                        Reel()
+                                    end
+                                    Reset()
+                                end
+                            end
+                        end
+                    end
+                    
                     repeat task.wait(0.1) until not rod.values.bite.Value
                 end
             end
