@@ -8,7 +8,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "🍪| Cookie Hub Fisch " .. Fluent.Version,
-    SubTitle = "by dawid",
+    SubTitle = "By Zepthical",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 420),
     Acrylic = true,
