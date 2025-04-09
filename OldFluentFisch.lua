@@ -1,6 +1,6 @@
 -- 🍪 Cookie Hub (Fluent UI) - Complete Script
 -- by Zepthical
-
+pcall(function()
 -- Load Fluent UI
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
@@ -57,13 +57,11 @@ local function getCharacter()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
 
-local function getRod()
-    local Rod = Char:FindFirstChildOfClass("Tool")
-end
+
+local Rod = Char:FindFirstChildOfClass("Tool")
 
 local function Cast()
-    local rod = getRod()
-    if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("cast") then
+    if Rod and rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
     	task.wait(.1)
     	Rod.events.cast:FireServer(100,1)
     end
@@ -126,10 +124,9 @@ local function Reel()
 end
 
 local function Reset()
-    local rod = getRod()
-    if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("reset") then
+    if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
         task.wait(0.1)
-        rod.events.reset:FireServer()
+        Rod.events.reset:FireServer()
 
         local equipRemote = ReplicatedStorage.packages.Net:FindFirstChild("RE/Backpack/Equip")
         if equipRemote then
@@ -196,9 +193,8 @@ Tabs.Fishing:AddToggle("AutoCast", {
     Callback = function(Value)
         States.AutoCast = Value
         while States.AutoCast do
-            local rod = getRod()
-             if rod and rod:FindFirstChild("values") then
-	      local casted = rod.values:FindFirstChild("casted")
+             if Rod and Rod:FindFirstChild("values") then
+	      local casted = Rod.values:FindFirstChild("casted")
 	      if casted.Value == false then
 		  pcall(function()
 		  Cast()
@@ -229,10 +225,9 @@ Tabs.Fishing:AddToggle("AutoReel", {
     Callback = function(Value)
         States.AutoReel = Value
         while States.AutoReel do
-            local rod = getRod()
-            if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
+            if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
                 -- ทำงานจนกว่าจะไม่มี bite
-                while rod.values.bite.Value do
+                while Rod.values.bite.Value do
                     -- รีลในขณะที่ยังมี bite
                     local success, errorMessage = pcall(function()
                         Reel()
@@ -265,3 +260,6 @@ Fluent:Notify({
     Content = "Successfully loaded!",
     Duration = 5
 })
+
+
+end)
