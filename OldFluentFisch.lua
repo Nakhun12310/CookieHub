@@ -23,6 +23,8 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local GuiService = game:GetService("GuiService")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local RunService = game:GetService("RunService")
+
 
 -- Tabs
 local Tabs = {
@@ -88,9 +90,12 @@ local function Shake()
 end
 
 local function Reel()
-    task.wait(0.2)
-    local reelUI = nil
+    -- ลองลดเวลา wait() ให้เร็วที่สุด
+    local rod = getRod()
+    if not rod then return end
     
+    -- ตรวจสอบค่าต่างๆ
+    local reelUI = nil
     for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
         if v:IsA("ScreenGui") and v.Name == "reel" then
             reelUI = v
@@ -98,29 +103,27 @@ local function Reel()
         end
     end
 
-    if not reelUI then return end 
-
+    if not reelUI then return end
     local bar = reelUI:FindFirstChild("bar")
-    if not bar then return end 
+    if not bar then return end
 
     local playerbar = bar:FindFirstChild("playerbar")
-    if not playerbar then return end 
+    if not playerbar then return end
 
     local events = ReplicatedStorage:FindFirstChild("events")
-    if not events then return end 
-
+    if not events then return end
     local reelFinished = events:FindFirstChild("reelfinished")
-    if not reelFinished then return end 
+    if not reelFinished then return end
 
-    
+    -- รีลให้เต็ม
     playerbar.Size = UDim2.new(1, 0, 1, 0)
     bar.Visible = false
 
+    -- ส่ง event ให้รีลเสร็จ
     pcall(function()
         reelFinished:FireServer(100, true)
     end)
 end
-
 
 local function Reset()
     local rod = getRod()
@@ -192,24 +195,33 @@ Tabs.Fishing:AddToggle("AutoCast", {
         States.AutoCast = Value
         while States.AutoCast do
             local rod = getRod()
-
-            
             if not rod or not rod.Parent then
+                print("No rod or rod parent is missing") -- ตรวจสอบว่าได้ rod จริงหรือไม่
                 break
             end
 
-            
-            if rod:FindFirstChild("values") and not rod.values.casted.Value then
-                pcall(function()
-                    Cast() 
-                end)
+            if rod:FindFirstChild("values") and rod.values:FindFirstChild("casted") then
+                if not rod.values.casted.Value then
+                    pcall(function()
+                        local success, errorMessage = pcall(function() 
+                            Cast()
+                        end)
+                        if not success then
+                            print("Error in casting: " .. errorMessage) -- ตรวจสอบ error ในการ cast
+                        end
+                    end)
+                else
+                    print("Rod already casted") -- แจ้งว่า rod ถูก casted แล้ว
+                end
+            else
+                print("No values or casted found in rod") -- แจ้งว่าไม่มีค่า casted ใน rod
             end
 
-            
             task.wait(0.45)
         end
     end
 })
+
 
 
 Tabs.Fishing:AddToggle("AutoShake", {
@@ -220,7 +232,7 @@ Tabs.Fishing:AddToggle("AutoShake", {
         while States.AutoShake do
             Shake()
 	    Shake()
-            task.wait(0.1) 
+            task.wait() 
         end
     end
 })
@@ -233,36 +245,25 @@ Tabs.Fishing:AddToggle("AutoReel", {
         while States.AutoReel do
             local rod = getRod()
             if rod and rod:FindFirstChild("values") and rod.values:FindFirstChild("bite") then
-                if rod.values.bite.Value then
-                    for _, v in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-                        if v:IsA("ScreenGui") and v.Name == "reel" then
-                            local bar = v:FindFirstChild("bar")
-                            if bar and ReplicatedStorage:FindFirstChild("events") then
-                                local playerbar = bar:FindFirstChild("playerbar")
-                                if playerbar then
-                                    playerbar.Size = UDim2.new(1, 0, 1, 0)
-                                    task.wait(1.5)
-                                    Reel()
-                                    task.wait(0.5)
-                                    Reel()
-                                    task.wait(1)
-                                    if rod.values.bite.Value then
-                                        Reel()
-                                    end
-                                    Reset()
-                                end
-                            end
-                        end
+                -- ทำงานจนกว่าจะไม่มี bite
+                while rod.values.bite.Value do
+                    -- รีลในขณะที่ยังมี bite
+                    local success, errorMessage = pcall(function()
+                        Reel()
+                    end)
+                    if not success then
+                        warn("Error in Reel: " .. errorMessage)
                     end
-                    
-                    repeat task.wait(0.1) until not rod.values.bite.Value
+
+                    -- ใช้เวลารอให้เร็วที่สุด แต่ไม่บัค
+                    task.wait(0.1) -- ใช้ wait แบบเร็วเพื่อไม่ให้เกิดการหน่วงมากเกินไป
                 end
             end
+            -- รอให้ครบเวลาจาก task.wait เพื่อให้การทำงานไม่กระทบกับ frame rate
             task.wait(0.1)
         end
     end
 })
-
 
 -- Initialize UI
 SaveManager:SetLibrary(Fluent)
