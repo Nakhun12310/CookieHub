@@ -199,18 +199,18 @@ Tabs.Fishing:AddToggle("AutoCast", {
     Default = States.AutoCast,
     Callback = function(Value)
         States.AutoCast = Value
-        while States.AutoCast do
-             if Rod and Rod:FindFirstChild("values") then
-	      local casted = Rod.values:FindFirstChild("casted")
-	      if casted.Value == false then
-		  pcall(function()
-		  Cast()
-	      end)
-	   end
+        while States.AutoCast and task.wait() do
+            if Rod and Rod:FindFirstChild("values") then
+                local casted = Rod.values:FindFirstChild("casted")
+                if casted and casted.Value == false then
+                    pcall(function()
+                        Cast()
+                    end)
+                end
+            end
         end
     end
 })
-
 
 
 Tabs.Fishing:AddToggle("AutoShake", {
