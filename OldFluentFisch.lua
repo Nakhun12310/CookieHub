@@ -57,9 +57,17 @@ local function getCharacter()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
 
-local Rod = Char:FindFirstChildOfClass("Tool") -- ค้นหา Rod ที่เป็น Tool
+local function GetRod()
+    for _, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+        if v:IsA("Tool") and v.Name:lower():find("rod") then
+            return v -- return the first rod found
+        end
+    end
+    return nil -- no rod found
+end
 
 local function Cast()
+    local Rod = GetRod()
     if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("cast") then
         task.wait(0.1) -- รอเวลาสักครู่
         Rod.events.cast:FireServer(100, 1) -- เรียกใช้ FireServer สำหรับการ Cast
@@ -96,7 +104,7 @@ end
 
 local function Reel()
     -- ลองลดเวลา wait() ให้เร็วที่สุด
-    local rod = getRod()
+    local rod = GetRod()
     if not rod then return end
     
     -- ตรวจสอบค่าต่างๆ
@@ -131,6 +139,7 @@ local function Reel()
 end
 
 local function Reset()
+    local Rod = GetRod()
     if Rod and Rod:FindFirstChild("events") and Rod.events:FindFirstChild("reset") then
         task.wait(0.1)
         Rod.events.reset:FireServer()
@@ -200,6 +209,7 @@ Tabs.Fishing:AddToggle("AutoCast", {
     Callback = function(Value)
         States.AutoCast = Value
         while States.AutoCast and task.wait() do
+	    local Rod = GetRod()
             if Rod and Rod:FindFirstChild("values") then
                 local casted = Rod.values:FindFirstChild("casted")
                 if casted and casted.Value == false then
@@ -232,6 +242,7 @@ Tabs.Fishing:AddToggle("AutoReel", {
     Callback = function(Value)
         States.AutoReel = Value
         while States.AutoReel do
+	    local Rod = GetRod()
             if Rod and Rod:FindFirstChild("values") and Rod.values:FindFirstChild("bite") then
                 -- ทำงานจนกว่าจะไม่มี bite
                 while Rod.values.bite.Value do
