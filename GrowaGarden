@@ -1,0 +1,43 @@
+for i, v in pairs(game.workspace.Farm:GetChildren()) do
+    if v:IsA("Folder") then
+        if v:FindFirstChild("Important") then
+            if v.Important:FindFirstChild("Plants_Physical") then
+                print("Plants_Physical Founded")
+                local plants = v.Important.Plants_Physical
+                print(plants.Name)
+                for i, f in pairs(plants:GetChildren()) do
+                    if f:IsA("Model") then
+                        if f.Name == "Carrot" then
+                            print("Carrot functions")
+                            elseif f.Name == "Strawberry" then
+                                print("strawberry functions")
+                                elseif f.Name == "Blueberry" then
+                                    print("blueberry functions")
+                                    elseif f.Name == "Tomato" then
+                                        print("tomato functions")
+                                        elseif f.Name == "Corn" then
+                                            print("corn functions")
+                                            elseif f.Name == "Watermelon" then
+                                                print("watermellon functions")
+                                                elseif f.Name == "Pumpkin" then
+                                                    print("pumpkin function")
+                                                    elseif f.Name == "Apple" then
+                                                        print("apple functions")
+                                                        elseif f.Name == "Bamboo" then
+                                                            print("bamboo functions")
+                                                            elseif f.Name == "Coconut" then
+                                                                print("coconut functions")
+                                                                elseif f.Name == "Cactus" then
+                                                                    print("cactus functinos")
+                                                                    elseif f.Name == "DragonFruit" then
+                                                                        print("df functions")
+                                                                        elseif f.Name == "Mango" then
+                                                                            print("mango functions")
+                                                            
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
