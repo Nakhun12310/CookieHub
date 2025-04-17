@@ -12,6 +12,7 @@ local Games = {
   [116495829188952] = "nil", -- Dead Rails
   [70876832253163] = "nil", -- Dead Rails
   [87039211657390] = "nil" -- Arise Crossover
+  [126884695634066] = "nil" -- Grow A Garden
 }
 
 return Games
