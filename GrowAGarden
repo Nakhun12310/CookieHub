@@ -6,6 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Global Toggle
 _G.autoCollect = true
 _G.autoWalkToPlant = true
+_G.SellInventory = true
 
 -- Get owned plot
 local function getOwnedPlot()
