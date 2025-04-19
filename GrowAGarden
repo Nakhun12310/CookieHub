@@ -5,8 +5,8 @@ local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercon
 
 -- Create Fluent Window
 local Window = Library:CreateWindow{
-    Title = `Fluent {Library.Version}`,
-    SubTitle = "by Actual Master Oogway",
+    Title = `Cookie Hub {Library.Version}`,
+    SubTitle = "by Cookie Hub Developer Team",
     TabWidth = 160,
     Size = UDim2.fromOffset(830, 525),
     Resize = true,
