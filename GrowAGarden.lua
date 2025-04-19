@@ -68,6 +68,37 @@ local function getOwnedPlot()
     return nil
 end
 
+task.spawn(function()
+	while task.wait(1) do
+		if AutoCollect then
+			local plot = getOwnedPlot()
+			local farm = plot and plot:FindFirstChild("Important"):FindFirstChild("Plants_Physical")
+			if farm then
+				for _, prompt in ipairs(farm:GetDescendants()) do
+					if prompt:IsA("ProximityPrompt") then
+						local playerRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+						if playerRoot then
+							local dist = (playerRoot.Position - prompt.Parent.Position).Magnitude
+							if dist <= 20 then
+								prompt.Exclusivity = Enum.ProximityPromptExclusivity.AlwaysShow
+								prompt.MaxActivationDistance = 100
+								prompt.RequiresLineOfSight = false
+								prompt.Enabled = true
+								fireproximityprompt(prompt, 1, true)
+							elseif _G.autoWalkToPlant then
+								local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+								if humanoid then
+									humanoid:MoveTo(prompt.Parent.Position + Vector3.new(0, 5, 0))
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+
 -- Auto Farming Loop
 task.spawn(function()
     while task.wait(1) do
@@ -99,11 +130,11 @@ task.spawn(function()
             end
         end
 
-        if SellInventoryToggle.Value then
+        elseif SellInventoryToggle.Value then
             sellInventory()
         end
     end
-end)
+end) 
 
 -- Add SaveManager / InterfaceManager Integration
 SaveManager:SetLibrary(Library)
