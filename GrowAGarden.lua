@@ -68,7 +68,7 @@ local function getOwnedPlot()
     return nil
 end
 
-task.spawn(function()
+--[[task.spawn(function()
 	while task.wait(1) do
 		if AutoCollect then
 			local plot = getOwnedPlot()
@@ -97,9 +97,9 @@ task.spawn(function()
 			end
 		end
 	end
-end)
+end)]]
 
--- Auto Farming Loop
+-- Auto Collect Loop
 task.spawn(function()
     while task.wait(1) do
         if Library.Unloaded then break end
@@ -129,12 +129,19 @@ task.spawn(function()
                 end
             end
         end
-
-        elseif SellInventoryToggle.Value then
-            sellInventory()
-        end
     end
 end) 
+
+task.spawn(function()
+    while task.wait(1) do
+	if Library.Unloaded then break end
+
+	if SellInventoryToggle.Value then
+	   sellInventory()
+	   task.wait(0.1)
+	end
+    end
+end)
 
 -- Add SaveManager / InterfaceManager Integration
 SaveManager:SetLibrary(Library)
